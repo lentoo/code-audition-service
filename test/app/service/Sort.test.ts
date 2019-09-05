@@ -7,7 +7,7 @@ describe('test/app/service/Sort.test.js', () => {
   let ctx: Context
   const openId = '1234567'
   let s: any
-
+  let pages = 0
   before(async () => {
     ctx = app.mockContext()
     ctx.headers['header-key'] = openId
@@ -16,19 +16,31 @@ describe('test/app/service/Sort.test.js', () => {
   })
 
   it('fetchSortList', async () => {
-    const sortList = await ctx.service.sort.findSortList()
-    assert(Array.isArray(sortList), 'sortList is Array')
-    assert(sortList.length > 0, 'sortList length $lt 0')
+    const { items } = await ctx.service.sort.findSortList()
+    assert(Array.isArray(items), 'sortList is Array')
+    assert(items.length > 0, 'sortList length $lt 0')
+  })
+
+  it('fetchSortList By Pagination first page', async () => {
+    const { page } = await ctx.service.sort.findSortList('', 1)
+    pages = page.pages
+    assert(page.page === 1, '测试第一页')
+  })
+
+  it('fetchSortList By Pagination last page', async () => {
+    const { page } = await ctx.service.sort.findSortList('', pages)
+    assert(page.page === pages)
+    assert(page.hasMore === false)
   })
 
   it('fetchSortList by name ', async () => {
-    const sortList = await ctx.service.sort.findSortList('vue')
-    assert(Array.isArray(sortList), 'sortList is Array')
-    assert(sortList.length > 0, 'sortList length $lt 0')
-    assert(sortList.every(item => item.sortName!.toLowerCase().includes('vue')))
+    const { items } = await ctx.service.sort.findSortList('vue')
+    assert(Array.isArray(items), 'sortList is Array')
+    assert(items.length > 0, 'sortList length $lt 0')
+    assert(items.every(item => item.sortName!.toLowerCase().includes('vue')))
   })
 
-  it('添加 sort ', async () => {
+  it('add sort ', async () => {
     s.sortName = 'sortName'
     s.icon = 'icon'
     const sort = await ctx.service.sort.saveSortItem(s)

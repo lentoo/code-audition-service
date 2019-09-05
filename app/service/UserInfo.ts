@@ -1,4 +1,8 @@
-import { UserInfoModel, UserInfo } from '../model/user/UserInfo'
+import {
+  UserInfoModel,
+  UserInfo,
+  PaginationUserResponse
+} from '../model/user/UserInfo'
 import { SortModel } from '../model/sort/Sort'
 import BaseService from './Base'
 /**
@@ -33,13 +37,24 @@ export default class UserInfoService extends BaseService {
     const user = await UserInfoModel.findOne({ openId })
     return user
   }
-  public async getUserList(_id?: string) {
+  public async getUserList(
+    _id?: string,
+    current: number = 1,
+    limit: number = 10
+  ) {
     let where = {}
     if (_id) {
       where = { openId: _id }
     }
-    const list = await UserInfoModel.find(where).exec()
-    return list
+    const { page, items } = await UserInfoModel.paginationQuery(
+      where,
+      current,
+      limit
+    )
+
+    const response = new PaginationUserResponse()
+    response.setData(page, items)
+    return response
   }
   /**
    * @description 删除用户信息

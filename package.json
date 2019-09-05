@@ -1,6 +1,6 @@
 {
   "name": "code-audition-service",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "使用 TypeScript + Egg.js + Mongoose + GraphQL 搭建的开发框架",
   "private": true,
   "egg": {
@@ -71,7 +71,7 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git@github.com:lentoo/ts-egg-mongoose-graphQL.git"
   },
   "eslintIgnore": [
     "coverage"

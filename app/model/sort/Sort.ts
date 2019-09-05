@@ -2,6 +2,7 @@ import { Application } from 'egg'
 import BaseModel from '../BaseModel'
 import { prop } from 'typegoose'
 import { ObjectType, Field } from 'type-graphql'
+import { PaginationResponseFactory } from '../Pagination'
 
 @ObjectType()
 export class Sort extends BaseModel {
@@ -40,6 +41,9 @@ export class Sort extends BaseModel {
 }
 
 export const SortModel = new Sort().getModelForClass(Sort)
+
+@ObjectType()
+export class PaginationSortResponse extends PaginationResponseFactory(Sort) {}
 
 export default (app: Application) => {
   return SortModel

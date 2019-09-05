@@ -11,6 +11,7 @@ import {
   ModelType
 } from 'typegoose'
 import BaseModel from '../BaseModel'
+import { PaginationResponseFactory } from '../Pagination'
 import { ObjectType, Field } from 'type-graphql'
 import { Sort } from '../sort/Sort'
 
@@ -142,6 +143,10 @@ export class UserInfo extends BaseModel {
 const user = new UserInfo().getModelForClass(UserInfo)
 
 export const UserInfoModel = user
+
+export class PaginationUserResponse extends PaginationResponseFactory(
+  UserInfo
+) {}
 
 export default (app: Application) => {
   return user

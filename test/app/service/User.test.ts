@@ -6,6 +6,7 @@ describe('test/app/service/User.test.js', () => {
   let ctx: Context
   let openId = ''
   let user: any = {}
+  let pages = 0
   before(async () => {
     ctx = app.mockContext()
     openId = `unit test ${Date.now().toString()}`
@@ -13,13 +14,25 @@ describe('test/app/service/User.test.js', () => {
   })
 
   it('fetchUserList', async () => {
-    const userList = await ctx.service.userInfo.getUserList()
-    assert(userList !== undefined)
+    const { items } = await ctx.service.userInfo.getUserList()
+    assert(items !== undefined)
   })
 
   it('fetchUserList length > 0', async () => {
-    const userList = await ctx.service.userInfo.getUserList()
-    assert(userList.length > 0)
+    const { items } = await ctx.service.userInfo.getUserList()
+    assert(items.length > 0)
+  })
+
+  it('getUserList By Pagination first page', async () => {
+    const { page } = await ctx.service.userInfo.getUserList('', 1)
+    pages = page.pages
+    assert(page.page === 1, '测试第一页')
+  })
+
+  it('getUserList By Pagination last page', async () => {
+    const { page } = await ctx.service.userInfo.getUserList('', pages)
+    assert(page.page === pages)
+    assert(page.hasMore === false)
   })
 
   it('saveUserInfo', async () => {

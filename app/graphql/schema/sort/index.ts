@@ -7,7 +7,7 @@ import {
   Mutation,
   Arg
 } from 'type-graphql'
-import { Sort } from '../../../model/sort/Sort'
+import { Sort, PaginationSortResponse } from '../../../model/sort/Sort'
 import { Context } from 'egg'
 @InputType({ description: '保存分类需要的参数' })
 class SortProp {
@@ -47,14 +47,19 @@ class SortProp {
   @Field({ nullable: true })
   questionNum?: number
 }
-@Resolver(of => Sort)
+@Resolver()
 export class SortResolver {
-  @Query(of => [Sort], { name: 'sorts', description: '查询分类列表' })
+  @Query(type => PaginationSortResponse, {
+    name: 'sorts',
+    description: '查询分类列表'
+  })
   async fetchSortList(
     @Ctx() ctx: Context,
-    @Arg('name', { nullable: true, defaultValue: '' }) name: string
+    @Arg('name', { nullable: true, defaultValue: '' }) name: string,
+    @Arg('page', { nullable: true, defaultValue: 1 }) page: number,
+    @Arg('limit', { nullable: true, defaultValue: 10 }) limit: number
   ) {
-    return ctx.service.sort.findSortList(name)
+    return ctx.service.sort.findSortList(name, page, limit)
   }
   @Mutation(() => Sort, { name: 'saveSort', description: '保存分类' })
   async saveSort(@Ctx() ctx: Context, @Arg('sort') sort: SortProp) {

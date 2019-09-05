@@ -1,6 +1,5 @@
-import { Typegoose, prop, pre } from 'typegoose'
+import { Typegoose, prop, pre, staticMethod, ModelType } from 'typegoose'
 import { Field, ObjectType } from 'type-graphql'
-import { Schema } from 'mongoose'
 @pre<BaseModel>('save', function(next) {
   if (!this.createAtDate || this.isNew) {
     this.createAtDate = this.updateAtDate = new Date()
@@ -19,4 +18,33 @@ export default class BaseModel extends Typegoose {
   @prop()
   @Field()
   updateAtDate?: Date
+
+  @staticMethod
+  static async paginationQuery<T>(
+    this: ModelType<T>,
+    where: any,
+    page: number = 1,
+    limit: number = 10
+  ) {
+    const flow = this.find(where)
+
+    const items = await flow
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec()
+
+    const count = await flow.count()
+
+    const pages = Math.ceil(count / limit)
+
+    return {
+      page: {
+        page,
+        limit: limit,
+        pages,
+        hasMore: page !== pages
+      },
+      items
+    }
+  }
 }
