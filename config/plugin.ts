@@ -1,4 +1,4 @@
-import { EggPlugin } from 'egg'
+import { EggPlugin } from 'egg';
 
 const plugin: EggPlugin = {
   // static: true,
@@ -8,12 +8,12 @@ const plugin: EggPlugin = {
   // },
   mongoose: {
     enable: true,
-    package: 'egg-mongoose'
+    package: 'egg-mongoose',
   },
   validate: {
     enable: true,
-    package: 'egg-validate'
-  }
+    package: 'egg-validate',
+  },
   // graphql: {
   //   enable: true,
   //   package: 'egg-graphql'
@@ -22,6 +22,6 @@ const plugin: EggPlugin = {
   //   enable: true,
   //   package: 'egg-type-graphql'
   // }
-}
+};
 
-export default plugin
+export default plugin;

@@ -22,7 +22,7 @@ export default class GraphQL {
   }
 
   getResolvers() {
-    const isLocal = this.app.env === 'local'
+    const isLocal = this.app.config.env === 'local'
     return [
       path.resolve(
         process.cwd(),

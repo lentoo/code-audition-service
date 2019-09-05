@@ -10,40 +10,32 @@ export class Sort extends BaseModel {
    * @type {string}
    * @memberof ISort
    */
-  @prop()
-  @Field()
+  @prop({ required: true })
+  @Field({ nullable: true })
   sortName?: string
   /**
    * @description 图标地址
    * @type {string}
    * @memberof ISort
    */
-  @prop()
-  @Field()
+  @prop({ required: true })
+  @Field({ nullable: true })
   icon?: string
-  /**
-   * @description 是否选择
-   * @type {string}
-   * @memberof ISort
-   */
-  @prop()
-  @Field()
-  select?: number
   /**
    * @description 关注人数
    * @type {number}
    * @memberof ISort
    */
-  @prop()
-  @Field()
+  @prop({ default: 0 })
+  @Field({ nullable: true })
   attentionNum?: number
   /**
    * @description 题目数
    * @type {number}
    * @memberof ISort
    */
-  @prop()
-  @Field()
+  @prop({ default: 0 })
+  @Field({ nullable: true })
   questionNum?: number
 }
 

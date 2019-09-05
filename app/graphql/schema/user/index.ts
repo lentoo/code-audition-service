@@ -50,4 +50,16 @@ export class UserInfoResolver {
 
     return await ctx.service.userInfo.saveUserInfo(u)
   }
+
+  @Mutation(() => UserInfo, { name: 'likeSort' })
+  async likeSort(@Ctx() ctx: Context, @Arg('sortId') sortId: string) {
+    const openId = ctx.headers['header-key']
+    return await ctx.service.userInfo.userLikeSort(openId, sortId)
+  }
+
+  @Mutation(() => UserInfo, { name: 'unLikeSort' })
+  async unLikeSort(@Ctx() ctx: Context, @Arg('sortId') sortId: string) {
+    const openId = ctx.headers['header-key']
+    return await ctx.service.userInfo.userUnLikeSort(openId, sortId)
+  }
 }

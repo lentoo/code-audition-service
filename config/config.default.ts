@@ -13,10 +13,7 @@ export default (appInfo: EggAppInfo) => {
       url: 'mongodb://127.0.0.1/codeAudition',
       options: {
         autoReconnect: true,
-
-        server: {
-          poolSize: 40
-        }
+        poolSize: 40
       }
     }
   }

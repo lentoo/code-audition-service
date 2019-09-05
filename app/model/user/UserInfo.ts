@@ -1,13 +1,19 @@
 import { Application } from 'egg'
 
-import { prop, pre } from 'typegoose'
+import {
+  prop,
+  pre,
+  Ref,
+  instanceMethod,
+  InstanceType,
+  arrayProp,
+  staticMethod,
+  ModelType
+} from 'typegoose'
 import BaseModel from '../BaseModel'
-import { ObjectType, Field, InputType } from 'type-graphql'
+import { ObjectType, Field } from 'type-graphql'
+import { Sort } from '../sort/Sort'
 
-@pre('save', function(next) {
-  console.log('UserInfo save')
-  next()
-})
 @ObjectType()
 export class UserInfo extends BaseModel {
   /**
@@ -15,7 +21,7 @@ export class UserInfo extends BaseModel {
    * @type {string}
    * @memberof UserInfo
    */
-  @Field()
+  @Field({ nullable: true })
   @prop()
   openId?: string
   /**
@@ -74,7 +80,63 @@ export class UserInfo extends BaseModel {
    */
   @prop({ default: 'user' })
   @Field()
-  role: string
+  role?: string
+
+  @arrayProp({ itemsRef: Sort, items: String })
+  @Field(type => [Sort], { nullable: true })
+  likeSorts?: Ref<Sort>[]
+  /**
+   * @description 用户关注分类
+   * @author lentoo
+   * @date 2019-09-04
+   * @param {Sort} sort
+   * @memberof UserInfo
+   */
+  @instanceMethod
+  async likeSort(this: InstanceType<UserInfo>, sort: Sort) {
+    if (this.likeSorts === undefined) {
+      this.likeSorts = []
+    }
+
+    if (this.likeSorts.find(sid => String(sid) === String(sort._id))) {
+      throw new Error('当前分类已关注')
+    }
+
+    this.likeSorts.push(sort)
+
+    return await this.save()
+  }
+  /**
+   * @description 是否关注某个分类
+   * @author lentoo
+   * @date 2019-09-04
+   * @param {InstanceType<UserInfo>} this
+   * @param {string} sortId 分类id
+   * @returns {boolean}
+   * @memberof UserInfo
+   */
+  @instanceMethod
+  public isLikeSortBySortId(this: InstanceType<UserInfo>, sortId: string) {
+    if (this.likeSorts === undefined) {
+      this.likeSorts = []
+      return false
+    }
+    return !!this.likeSorts!.find(sid => String(sid) === sortId)
+  }
+
+  @staticMethod
+  public static async isExist(
+    this: ModelType<UserInfo> & typeof UserInfo,
+    openId: string
+  ) {
+    const user = await this.findOne({
+      openId
+    }).exec()
+    if (!user) {
+      throw new Error('用户不存在')
+    }
+    return user
+  }
 }
 
 const user = new UserInfo().getModelForClass(UserInfo)

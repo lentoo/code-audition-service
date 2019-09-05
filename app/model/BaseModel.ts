@@ -1,7 +1,7 @@
 import { Typegoose, prop, pre } from 'typegoose'
 import { Field, ObjectType } from 'type-graphql'
+import { Schema } from 'mongoose'
 @pre<BaseModel>('save', function(next) {
-  console.log('BaseModel pre')
   if (!this.createAtDate || this.isNew) {
     this.createAtDate = this.updateAtDate = new Date()
   } else {
@@ -11,6 +11,8 @@ import { Field, ObjectType } from 'type-graphql'
 })
 @ObjectType()
 export default class BaseModel extends Typegoose {
+  @Field()
+  _id?: string
   @prop()
   @Field()
   createAtDate?: Date
