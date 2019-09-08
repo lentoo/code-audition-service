@@ -28,13 +28,15 @@ export default class BaseModel extends Typegoose {
   ) {
     const flow = this.find(where)
 
+    const count = await this.find(where).count()
+
     const items = await flow
       .skip((page - 1) * limit)
       .limit(limit)
       .exec()
+    console.log('item', items)
 
-    const count = await flow.count()
-
+    console.log('count', count)
     const pages = Math.ceil(count / limit)
 
     return {

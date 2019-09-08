@@ -14,27 +14,24 @@ export default class UserInfoService extends BaseService {
    */
   public async saveUserInfo(u: UserInfo) {
     const headerKey = this.ctx.headers['header-key']
-    let user = await this.findUserByOpenId(headerKey)
-
-    if (user) {
-      Object.assign(user, u)
-    } else {
+    let user
+    try {
+      user = await this.findUserByOpenId(headerKey)
+    } catch (error) {
       user = new UserInfoModel()
-      Object.assign(user, u)
     }
+
+    Object.assign(user, u)
+
     user.openId = headerKey
-    // const {
-    //   nickName,
-    //   avatarUrl,
-    //   gender,
-    //   province,
-    //   country,
-    //   city
-    // } = this.ctx.request.body
+
     return await user.save()
   }
   public async findUserByOpenId(openId: string) {
-    const user = await UserInfoModel.findOne({ openId })
+    const user = await UserInfoModel.findOne({ openId }).exec()
+    if (!user) {
+      this.error('用户不存在')
+    }
     return user
   }
   public async getUserList(
@@ -90,6 +87,7 @@ export default class UserInfoService extends BaseService {
       this.error('分类不存在')
     }
   }
+
   public async userUnLikeSort(openId: string, sortId: string) {
     const user = await UserInfoModel.isExist(openId)
     const sort = await SortModel.findById(sortId)
@@ -98,7 +96,8 @@ export default class UserInfoService extends BaseService {
         sort.attentionNum! -= 1
         if (user.likeSorts) {
           user.likeSorts.splice(
-            user.likeSorts.findIndex(sid => String(sid) === String(sort._id))
+            user.likeSorts.findIndex(sid => String(sid) === String(sort._id)),
+            1
           )
         }
       } else {

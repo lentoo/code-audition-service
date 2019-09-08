@@ -8,7 +8,7 @@ import {
   Field
 } from 'type-graphql'
 import { Context } from 'egg'
-import { UserInfo } from '../../../model/user/UserInfo'
+import { UserInfo, PaginationUserResponse } from '../../../model/user/UserInfo'
 @InputType({ description: '新增用户类型' })
 class AddUserProp {
   @Field({ nullable: false })
@@ -16,18 +16,23 @@ class AddUserProp {
   @Field({ nullable: false })
   avatarUrl: string
   @Field({ nullable: false })
-  gender: string
+  gender: number
   @Field({ nullable: false })
   province: string
   @Field({ nullable: false })
   country: string
   @Field({ nullable: false })
   city: string
+  @Field({ nullable: true })
+  language: string
 }
 
 @Resolver(() => UserInfo)
 export class UserInfoResolver {
-  @Query(returns => [UserInfo], { name: 'users', description: '查询用户列表' })
+  @Query(returns => PaginationUserResponse, {
+    name: 'users',
+    description: '查询用户列表'
+  })
   async fetchUserList(
     @Ctx() ctx: Context,
     @Arg('_id', { nullable: true }) id: string
@@ -35,7 +40,7 @@ export class UserInfoResolver {
     return await ctx.service.userInfo.getUserList(id)
   }
 
-  @Query(of => UserInfo, { name: 'user', description: '查询用户信息' })
+  @Query(returns => UserInfo, { name: 'user', description: '查询用户信息' })
   async fetchUser(@Arg('_id') id: string, @Ctx() ctx: Context) {
     return await ctx.service.userInfo.findUserByOpenId(id)
   }

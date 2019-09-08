@@ -2,7 +2,6 @@ import { Application } from 'egg'
 
 import {
   prop,
-  pre,
   Ref,
   instanceMethod,
   InstanceType,
@@ -31,7 +30,7 @@ export class UserInfo extends BaseModel {
    * @memberof UserInfo
    */
   @prop()
-  @Field()
+  @Field({ nullable: true })
   nickName?: string
   /**
    * @description 用户头像地址
@@ -39,7 +38,7 @@ export class UserInfo extends BaseModel {
    * @memberof UserInfo
    */
   @prop()
-  @Field()
+  @Field({ nullable: true })
   avatarUrl?: string
   /**
    * @description 用户性别 1 -> 男 2 -> 女
@@ -47,7 +46,7 @@ export class UserInfo extends BaseModel {
    * @memberof UserInfo
    */
   @prop()
-  @Field()
+  @Field({ nullable: true })
   gender?: string
   /**
    * @description 用户所在省
@@ -55,7 +54,7 @@ export class UserInfo extends BaseModel {
    * @memberof UserInfo
    */
   @prop()
-  @Field()
+  @Field({ nullable: true })
   province?: string
   /**
    * @description 用户所在国家
@@ -63,7 +62,7 @@ export class UserInfo extends BaseModel {
    * @memberof UserInfo
    */
   @prop()
-  @Field()
+  @Field({ nullable: true })
   country?: string
   /**
    * @description 用户所在城市
@@ -71,8 +70,12 @@ export class UserInfo extends BaseModel {
    * @memberof UserInfo
    */
   @prop()
-  @Field()
+  @Field({ nullable: true })
   city?: string
+
+  @prop({ default: 'zh-CN' })
+  @Field({ nullable: true })
+  language?: string
 
   /**
    * @description 用户角色
@@ -80,7 +83,7 @@ export class UserInfo extends BaseModel {
    * @memberof UserInfo
    */
   @prop({ default: 'user' })
-  @Field()
+  @Field({ nullable: true })
   role?: string
 
   @arrayProp({ itemsRef: Sort, items: String })
@@ -144,6 +147,7 @@ const user = new UserInfo().getModelForClass(UserInfo)
 
 export const UserInfoModel = user
 
+@ObjectType()
 export class PaginationUserResponse extends PaginationResponseFactory(
   UserInfo
 ) {}

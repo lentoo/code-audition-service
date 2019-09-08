@@ -38,6 +38,14 @@ export class Sort extends BaseModel {
   @prop({ default: 0 })
   @Field({ nullable: true })
   questionNum?: number
+
+  /**
+   * @description 用于表示 用户是否关注该分类  0 表示没有 1 表示已关注
+   * @type {number}
+   * @memberof Sort
+   */
+  @Field({ nullable: true })
+  select?: 0 | 1
 }
 
 export const SortModel = new Sort().getModelForClass(Sort)

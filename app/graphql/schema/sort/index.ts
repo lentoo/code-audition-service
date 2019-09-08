@@ -61,6 +61,20 @@ export class SortResolver {
   ) {
     return ctx.service.sort.findSortList(name, page, limit)
   }
+
+  @Query(type => PaginationSortResponse, {
+    name: 'fetchSortListByUserSelect',
+    description: '获取分类列表，并显示当前用户是否关注'
+  })
+  async fetchSortListByUserSelect(
+    @Ctx() ctx: Context,
+    @Arg('name', { nullable: true, defaultValue: '' }) name: string,
+    @Arg('page', { nullable: true, defaultValue: 1 }) page: number,
+    @Arg('limit', { nullable: true, defaultValue: 10 }) limit: number
+  ) {
+    return ctx.service.sort.fetchSortListByUserSelect(name, page, limit)
+  }
+
   @Mutation(() => Sort, { name: 'saveSort', description: '保存分类' })
   async saveSort(@Ctx() ctx: Context, @Arg('sort') sort: SortProp) {
     const s = new Sort()
