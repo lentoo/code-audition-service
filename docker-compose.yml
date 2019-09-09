@@ -1,0 +1,43 @@
+version: "3"
+services: 
+  nginx:
+    image: nginx:latest
+    container_name: "nginx-node-1"
+    depends_on:
+      - egg-code-audition
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/Users/lentoo/Downloads/cert/cert.pem:/Users/lentoo/Downloads/cert/cert.pem"
+      - "/Users/lentoo/Downloads/cert/cert.key:/Users/lentoo/Downloads/cert/cert.key"
+      - "/Users/lentoo/usr/etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
+    links:
+      - "egg-code-audition:egg-code-node-1"
+    networks:
+     - code-audition-network
+  mongo:
+    image: mongo:latest
+    container_name: "mongo-node-1"
+    ports:
+      - "27017:27017"
+    volumes:
+      - "/Users/lentoo/usr/etc/mongo:/data/db"
+    networks:
+      - code-audition-network
+  egg-code-audition:
+    build: .
+    container_name: "egg-code-node-1"
+    ports: 
+      - "7001:7001"
+    depends_on:
+      - mongo
+    volumes: 
+      - "/Users/lentoo/logs:/root/logs"
+    links:
+      - "mongo:mongo-node-1"
+    networks:
+     - code-audition-network
+networks: 
+  code-audition-network:
+    driver: bridge
