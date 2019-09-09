@@ -5,10 +5,12 @@ import {
   Arg,
   Mutation,
   InputType,
-  Field
+  Field,
+  UseMiddleware
 } from 'type-graphql'
 import { Context } from 'egg'
 import { UserInfo, PaginationUserResponse } from '../../../model/user/UserInfo'
+import { RequestLogRecord, ResolveRequestTime } from '../../middleware'
 @InputType({ description: '新增用户类型' })
 class AddUserProp {
   @Field({ nullable: false })
@@ -33,6 +35,7 @@ export class UserInfoResolver {
     name: 'users',
     description: '查询用户列表'
   })
+  @UseMiddleware(RequestLogRecord, ResolveRequestTime)
   async fetchUserList(
     @Ctx() ctx: Context,
     @Arg('_id', { nullable: true }) id: string

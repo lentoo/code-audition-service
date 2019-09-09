@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "egg-scripts start --daemon --title=egg-server-code-audition-egg-node",
+    "start:serve": "egg-scripts start --title=egg-server-code-audition-egg-node",
     "stop": "egg-scripts stop --title=egg-server-code-audition-egg-node",
     "dev": "egg-bin dev",
     "debug": "egg-bin debug",

@@ -4,7 +4,7 @@ import { ApolloServer } from 'apollo-server-koa'
 import { Application } from 'egg'
 import { GraphQLSchema } from 'graphql'
 import { buildSchema } from 'type-graphql'
-
+import { ErrorResolve } from './middleware'
 export interface GraphQLConfig {
   router: string
   dateScalarMode?: 'isoDate' | 'timestamp'
@@ -34,7 +34,8 @@ export default class GraphQL {
   async init() {
     this.graphqlSchema = await buildSchema({
       resolvers: this.getResolvers(),
-      dateScalarMode: this.config.dateScalarMode
+      dateScalarMode: this.config.dateScalarMode,
+      globalMiddlewares: [ErrorResolve]
     })
     const server = new ApolloServer({
       schema: this.graphqlSchema,
