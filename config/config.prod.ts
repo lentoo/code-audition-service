@@ -13,5 +13,28 @@ export default (appInfo: EggAppInfo) => {
     }
   }
 
+  config.redis = {
+    client: {
+      port: 6379,
+      host: 'redis-node-1',
+      db: 0,
+      password: ''
+    }
+  }
+  config.io = {
+    init: {},
+    namespace: {
+      '/scanLogin': {
+        connectionMiddleware: ['connection'],
+        packetMiddleware: []
+      }
+    },
+    redis: {
+      host: 'redis-node-1',
+      port: 6379,
+      db: 1
+    }
+  }
+
   return config
 }

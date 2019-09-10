@@ -25,6 +25,16 @@ services:
       - "/www/data/mongo:/data/db"
     networks:
       - code-audition-network
+  redis: 
+    image: redis
+    container_name: "redis-node-1"
+    ports:
+      - "6379:6379"
+    volumes:
+      - "/www/data/redis:/data"
+    networks:
+      - code-audition-network
+
   egg-code-audition:
     build: .
     container_name: "egg-code-node-1"

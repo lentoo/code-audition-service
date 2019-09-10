@@ -1,4 +1,4 @@
-import { Service } from 'egg';
+import { Service } from 'egg'
 /**
  * Test Service
  */
@@ -13,5 +13,6 @@ export default class Test extends Service {
     // await user.save()
     // const userlist = await this.ctx.model.UserInfo.find()
     // return userlist
+    return 'say hi egg'
   }
 }

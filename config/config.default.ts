@@ -7,17 +7,6 @@ export default (appInfo: EggAppInfo) => {
   // use for cookie sign key, should change to your own and keep security
   config.keys = appInfo.name + '_1566822825217_634'
 
-  // add mongodb config
-  config.mongoose = {
-    client: {
-      url: 'mongodb://127.0.0.1/codeAudition',
-      options: {
-        autoReconnect: true,
-        poolSize: 40
-      }
-    }
-  }
-
   config.security = {
     csrf: {
       enable: false
@@ -28,9 +17,14 @@ export default (appInfo: EggAppInfo) => {
     router: '/graphql',
     dateScalarMode: 'isoDate'
   }
+  config.cors = {
+    origin: '*',
+    allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
+    credentials: true
+  }
 
   // add your egg config in here
-  config.middleware = ['auth']
+  config.middleware = []
 
   // add your special config in here
   const bizConfig = {

@@ -47,3 +47,13 @@ export default class BaseModel extends Typegoose {
     }
   }
 }
+
+@ObjectType()
+export class ActionResponseModel {
+  @Field()
+  code: Number
+  @Field()
+  msg: string
+  @Field({ nullable: true })
+  data?: string
+}

@@ -1,27 +1,31 @@
-import { EggPlugin } from 'egg';
+import { EggPlugin } from 'egg'
 
 const plugin: EggPlugin = {
-  // static: true,
+  static: true,
   // nunjucks: {
   //   enable: true,
   //   package: 'egg-view-nunjucks',
   // },
   mongoose: {
     enable: true,
-    package: 'egg-mongoose',
+    package: 'egg-mongoose'
   },
   validate: {
     enable: true,
-    package: 'egg-validate',
+    package: 'egg-validate'
   },
-  // graphql: {
-  //   enable: true,
-  //   package: 'egg-graphql'
-  // }
-  // typeGraphQL: {
-  //   enable: true,
-  //   package: 'egg-type-graphql'
-  // }
-};
+  cors: {
+    enable: true,
+    package: 'egg-cors'
+  },
+  io: {
+    enable: true,
+    package: 'egg-socket.io'
+  },
+  redis: {
+    enable: true,
+    package: 'egg-redis'
+  }
+}
 
-export default plugin;
+export default plugin

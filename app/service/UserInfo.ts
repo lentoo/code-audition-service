@@ -1,3 +1,13 @@
+/**
+ * https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL
+ *
+ * @summary UserService 相关业务
+ * @author lentoo <729533020@qq.com>
+ *
+ * Created at     : 2019-09-09 19:43:20
+ * Last modified  : 2019-09-09 19:50:39
+ */
+
 import {
   UserInfoModel,
   UserInfo,

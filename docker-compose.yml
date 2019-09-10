@@ -1,5 +1,6 @@
 version: "3"
 services: 
+
   nginx:
     image: nginx:latest
     container_name: "nginx-node-1"
@@ -15,7 +16,8 @@ services:
     links:
       - "egg-code-audition:egg-code-node-1"
     networks:
-     - code-audition-network
+      - code-audition-network
+
   mongo:
     image: mongo:latest
     container_name: "mongo-node-1"
@@ -25,6 +27,17 @@ services:
       - "/Users/lentoo/usr/etc/mongo:/data/db"
     networks:
       - code-audition-network
+
+  redis: 
+    image: redis
+    container_name: "redis-node-1"
+    ports:
+      - "6379:6379"
+    volumes:
+      - "/Users/lentoo/usr/etc/redis:/data"
+    networks:
+      - code-audition-network
+
   egg-code-audition:
     build: .
     container_name: "egg-code-node-1"
@@ -32,12 +45,15 @@ services:
       - "7001:7001"
     depends_on:
       - mongo
+      - redis
     volumes: 
       - "/Users/lentoo/logs:/root/logs"
     links:
       - "mongo:mongo-node-1"
+      - "redis:redis-node-1"
     networks:
      - code-audition-network
+
 networks: 
   code-audition-network:
     driver: bridge
