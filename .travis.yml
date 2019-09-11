@@ -1,7 +1,7 @@
-sudo: false
 language: node_js
+sudo: required
 node_js:
-  - '8'
+  - '10.16.0'
 before_install:
   - npm i npminstall -g
 install:
