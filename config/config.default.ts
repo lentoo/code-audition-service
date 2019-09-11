@@ -22,6 +22,17 @@ export default (appInfo: EggAppInfo) => {
     allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
     credentials: true
   }
+  // add mongodb config
+  config.mongoose = {
+    client: {
+      url: 'mongodb://127.0.0.1/codeAudition',
+      options: {
+        autoReconnect: true,
+        poolSize: 40,
+        useFindAndModify: false
+      }
+    }
+  }
 
   // add your egg config in here
   config.middleware = []

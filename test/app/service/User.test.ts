@@ -5,9 +5,10 @@ import { app } from 'egg-mock/bootstrap'
 describe('test/app/service/User.test.js', () => {
   let ctx: Context
   let openId = ''
-  let user: any = {}
+  let user
   let pages = 0
   before(async () => {
+    user = {}
     ctx = app.mockContext()
     openId = `unit test ${Date.now().toString()}`
     ctx.headers['header-key'] = openId

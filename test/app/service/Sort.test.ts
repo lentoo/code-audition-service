@@ -48,6 +48,17 @@ describe('test/app/service/Sort.test.js', () => {
     assert(sort !== undefined)
   })
 
+  it('update sort ', async () => {
+    s.sortName = 'sortName update'
+    s.icon = 'icon update'
+    const sort = await ctx.service.sort.saveSortItem(s)
+    const { items } = await ctx.service.sort.findSortList(s.sortName)
+    assert(items.length > 0)
+    const _sort = items[0]
+    assert(s.sortName === _sort.sortName)
+    assert(s.icon === _sort.icon)
+  })
+
   it('Delete a non-existent sort', async () => {
     try {
       await ctx.service.sort.remoteSortItem('5d6f80618939276115e15bd7')

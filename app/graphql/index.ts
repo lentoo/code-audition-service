@@ -2,7 +2,7 @@ import * as path from 'path'
 
 import { ApolloServer } from 'apollo-server-koa'
 import { Application } from 'egg'
-import { GraphQLSchema } from 'graphql'
+import { GraphQLSchema, GraphQLFormattedError } from 'graphql'
 import { buildSchema } from 'type-graphql'
 import { ErrorResolve } from './middleware'
 export interface GraphQLConfig {
@@ -39,6 +39,12 @@ export default class GraphQL {
     })
     const server = new ApolloServer({
       schema: this.graphqlSchema,
+      formatError: error => {
+        const err = new FormatError()
+        err.message = error.message
+        err.path = error.path
+        return err
+      },
       tracing: false,
       context: ({ ctx }) => ctx, // 将 egg 的 context 作为 Resolver 传递的上下文
       playground: {
@@ -61,4 +67,11 @@ export default class GraphQL {
   get schema(): GraphQLSchema {
     return this.graphqlSchema
   }
+}
+
+class FormatError implements GraphQLFormattedError {
+  message: string
+  locations?: readonly import('graphql').SourceLocation[] | undefined
+  path?: readonly (string | number)[] | undefined
+  extensions?: Record<string, any> | undefined
 }

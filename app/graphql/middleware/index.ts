@@ -1,5 +1,4 @@
 import { MiddlewareFn } from 'type-graphql'
-
 export const RequestLogRecord: MiddlewareFn = async ({ info }, next) => {
   // console.log('RequestLogRecord', arg)
   console.log(`Request Url -> ${info.parentType.name}.${info.fieldName}`)
@@ -18,6 +17,7 @@ export const ErrorResolve: MiddlewareFn = async ({ info }, next) => {
   try {
     await next()
   } catch (error) {
-    console.log('error', error)
+    console.error('error', error)
+    throw error
   }
 }

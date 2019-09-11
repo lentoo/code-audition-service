@@ -40,11 +40,22 @@ export default class SortService extends BaseService {
     let s = await SortModel.findOne({
       sortName: sort.sortName
     })
-    if (!s) {
-      s = new SortModel()
+    if (s) {
+      this.error(`该分类已存在 ${sort.sortName}`)
     }
-    Object.assign(s, sort)
-    return await s.save()
+    if (sort._id) {
+      // 更新操作
+      return await SortModel.findByIdAndUpdate(sort._id, {
+        sortName: sort.sortName,
+        icon: sort.icon
+      })
+    } else {
+      // 添加操作
+      s = new SortModel()
+
+      Object.assign(s, sort)
+      return await s.save()
+    }
   }
 
   /**
@@ -56,14 +67,24 @@ export default class SortService extends BaseService {
    * @memberof SortService
    */
   public async remoteSortItem(sortId: string) {
-    let s = await SortModel.findOne({
+    let sort = await SortModel.findById({
       _id: sortId
     }).exec()
+    if (sort) {
+      if (sort.questionNum) {
+        this.error('当前分类还有题目，无法删除')
+      }
+      if (sort.attentionNum) {
+        this.error('当前分类还有用户关注，无法删除')
+      }
+    } else {
+      this.error('分类不存在')
+    }
     const { ok, n } = await SortModel.deleteOne({
       _id: sortId
     })
     if (!ok) {
-      this.error('分类不存在')
+      this.error('删除失败，请重试')
     }
     return sortId
   }

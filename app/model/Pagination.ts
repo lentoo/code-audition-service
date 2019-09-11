@@ -5,6 +5,8 @@ export class PaginationModel {
   @Field()
   limit: number
   @Field()
+  total: number
+  @Field()
   page: number
   @Field()
   pages: number

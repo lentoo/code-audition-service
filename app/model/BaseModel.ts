@@ -1,5 +1,6 @@
 import { Typegoose, prop, pre, staticMethod, ModelType } from 'typegoose'
 import { Field, ObjectType } from 'type-graphql'
+import { PaginationModel } from './Pagination'
 @pre<BaseModel>('save', function(next) {
   if (!this.createAtDate || this.isNew) {
     this.createAtDate = this.updateAtDate = new Date()
@@ -41,6 +42,7 @@ export default class BaseModel extends Typegoose {
         page,
         limit: limit,
         pages,
+        total: count,
         hasMore: page !== pages
       },
       items

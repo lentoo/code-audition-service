@@ -8,7 +8,8 @@ export default (appInfo: EggAppInfo) => {
       url: 'mongodb://mongo-node-1/codeAudition',
       options: {
         autoReconnect: true,
-        poolSize: 40
+        poolSize: 40,
+        useFindAndModify: false
       }
     }
   }

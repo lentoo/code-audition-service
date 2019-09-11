@@ -81,4 +81,9 @@ export class SortResolver {
     Object.assign(s, sort)
     return ctx.service.sort.saveSortItem(s)
   }
+
+  @Mutation(() => String, { name: 'removeSort', description: '删除分类' })
+  async removeSort(@Ctx() ctx: Context, @Arg('id') sortId: string) {
+    return ctx.service.sort.remoteSortItem(sortId)
+  }
 }
