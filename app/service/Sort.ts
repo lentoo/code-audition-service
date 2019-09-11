@@ -67,7 +67,7 @@ export default class SortService extends BaseService {
    * @memberof SortService
    */
   public async remoteSortItem(sortId: string) {
-    let sort = await SortModel.findById({
+    const sort = await SortModel.findById({
       _id: sortId
     }).exec()
     if (sort) {
@@ -99,7 +99,6 @@ export default class SortService extends BaseService {
     current = 1,
     limit = 10
   ) {
-    this.ctx.openId
     const user = await this.service.userInfo.findUserByOpenId(this.ctx.openId)
     if (user === null) {
       this.error('用户不存在')

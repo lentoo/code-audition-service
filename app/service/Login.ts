@@ -19,6 +19,8 @@ import {
 import { SocketManager } from '../io'
 import BaseService from './Base'
 import { UserInfoModel } from '../model/user/UserInfo'
+
+// tslint:disable-next-line: no-var-requires
 const nanoid = require('nanoid')
 export default class LoginService extends BaseService {
   /**

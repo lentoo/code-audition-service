@@ -1,3 +1,12 @@
 {
-  "extends": ["tslint-config-egg"]
+  "extends": ["tslint-config-egg", "tslint-config-prettier"],
+  "rules": {
+    "no-console": false,
+    "no-implicit-dependencies": false,
+    "no-submodule-imports": false,
+    "no-this-assignment": false,
+    "array-type": false,
+    "only-arrow-functions": false,
+    "ter-prefer-arrow-callback": false
+  }
 }

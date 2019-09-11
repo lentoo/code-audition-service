@@ -2,9 +2,10 @@ import * as path from 'path'
 
 import { ApolloServer } from 'apollo-server-koa'
 import { Application } from 'egg'
-import { GraphQLSchema, GraphQLFormattedError } from 'graphql'
+import { GraphQLSchema, GraphQLFormattedError, SourceLocation } from 'graphql'
 import { buildSchema } from 'type-graphql'
 import { ErrorResolve } from './middleware'
+
 export interface GraphQLConfig {
   router: string
   dateScalarMode?: 'isoDate' | 'timestamp'
@@ -71,7 +72,7 @@ export default class GraphQL {
 
 class FormatError implements GraphQLFormattedError {
   message: string
-  locations?: readonly import('graphql').SourceLocation[] | undefined
+  locations?: readonly SourceLocation[] | undefined
   path?: readonly (string | number)[] | undefined
   extensions?: Record<string, any> | undefined
 }
