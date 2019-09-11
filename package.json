@@ -1,6 +1,6 @@
 {
   "name": "code-audition-service",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "使用 TypeScript + Egg.js + Mongoose + GraphQL 搭建的开发框架",
   "private": true,
   "egg": {
