@@ -17,13 +17,13 @@
     "test": "npm run lint -- --fix && npm run test-local",
     "cov": "egg-bin cov",
     "tsc": "ets && tsc -p tsconfig.json",
-    "ci": "npm run lint && npm run cov && npm run tsc",
+    "ci": "npm run lint",
     "autod": "autod",
     "lint": "tslint --project . -c tslint.json",
     "clean": "ets clean",
     "commit": "git-cz",
     "release": "release-it",
-    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -p"
   },
   "config": {
     "commitizen": {
