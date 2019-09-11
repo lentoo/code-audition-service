@@ -28,4 +28,5 @@ script:
 after_script:
   - npminstall codecov && codecov
 after_success:
-  - ls -a && echo 'success'
+  -  shh root@101.37.13.125 -o StrictHostKeyChecking=no 'cd /www/code/Ts-Egg-Mongoose-GraphQL && sh setup.sh'
+
