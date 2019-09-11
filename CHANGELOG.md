@@ -1,4 +1,4 @@
-## 0.0.1 (2019-09-10)
+## 0.0.1 (2019-09-11)
 
 
 ### Bug Fixes
@@ -9,6 +9,7 @@
 ### Features
 
 * 🎸 新增 Docker 构建脚本 ([51055dd](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/commit/51055dd))
+* 🎸 新增 graphql 自定义错误内容，分类支持修改和删除 ([2a96b82](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/commit/2a96b82))
 * 🎸 新增扫码登陆功能 ([028a429](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/commit/028a429))
 * 🎸 新增自定义中间件 ([643027c](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/commit/643027c))
 * initial project ([33d17e6](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/commit/33d17e6))
