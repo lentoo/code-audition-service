@@ -2,31 +2,27 @@ language: node_js
 sudo: required
 node_js:
 - 10.16.0
-branchs: 
+branchs:
   only:
-    - master
-addons: 
-  ssh_known_hosts:
-    - 101.37.13.125
-cache: 
+  - master
+addons:
+  ssh_known_hosts: "$IP"
+cache:
   directories:
-   - node_modules
+  - node_modules
 before_install:
-  - openssl aes-256-cbc -K $encrypted_28b4b9e40eeb_key -iv $encrypted_28b4b9e40eeb_iv  -in ./.travis/id_rsa.enc -out ~/.ssh/id_rsa -d
-  # 开启 ssh-agent，即允许使用 ssh 命令
-  - eval "$(ssh-agent -s)"
-  # 给予 id_rsa 文件权限，避免警告
-  - chmod 600 ~/.ssh/id_rsa
-  # 将私钥添加到 ssh
-  - ssh-add ~/.ssh/id_rsa
-  
-  - npm i npminstall -g
+- openssl aes-256-cbc -K $encrypted_a10dcc10ccec_key -iv $encrypted_a10dcc10ccec_iv
+  -in ./.travis/id_rsa.enc -out ~/.ssh/id_rsa -d
+- eval "$(ssh-agent -s)"
+- chmod 600 ~/.ssh/id_rsa
+- npm i npminstall -g
 install:
-  - npminstall
+- npminstall
 script:
-  - npm run ci
+- npm run ci
 after_script:
-  - npminstall codecov && codecov
+- npminstall codecov && codecov
+- pwd
 after_success:
-  -  ssh root@101.37.13.125 -o StrictHostKeyChecking=no 'cd /www/code/Ts-Egg-Mongoose-GraphQL && sh setup.sh'
-
+- ssh $USER@$IP -o StrictHostKeyChecking=no 'cd /www/code/Ts-Egg-Mongoose-GraphQL
+  && sh setup.sh'
