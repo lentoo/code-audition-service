@@ -1,11 +1,13 @@
 import * as assert from 'assert'
 import { Context } from 'egg'
 import { app } from 'egg-mock/bootstrap'
+import { Sort } from '../../../app/model/sort/Sort'
 
 describe('test/app/service/User.test.js', () => {
   let ctx: Context
   let openId = ''
   let user
+  let sort: Sort
   let pages = 0
   before(async () => {
     user = {}
@@ -53,17 +55,21 @@ describe('test/app/service/User.test.js', () => {
   })
 
   it('userLikeSort', async () => {
+    const { items } = await ctx.service.sort.findSortList()
+    assert(items.length > 0)
+    sort = items[0]
     const result = await ctx.service.userInfo.userLikeSort(
       openId,
-      '5d6f7c432d091854019fe3a5'
+      sort._id!
     )
+    
     assert(result !== undefined)
   })
 
   it('userUnLikeSort', async () => {
     const result = await ctx.service.userInfo.userUnLikeSort(
       openId,
-      '5d6f7c432d091854019fe3a5'
+      sort._id!
     )
     assert(result !== undefined)
   })
