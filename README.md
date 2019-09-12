@@ -1,6 +1,8 @@
+
 # ts-egg-mongoose-graphQL
 使用 TypeScript + Egg.js + Mongoose + GraphQL 搭建的开发框架
 
+[![Build Status](https://travis-ci.org/lentoo/Ts-Egg-Mongoose-GraphQL.svg?branch=master)](https://travis-ci.org/lentoo/Ts-Egg-Mongoose-GraphQL)
 
 ## QuickStart
 
