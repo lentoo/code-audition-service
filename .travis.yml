@@ -10,6 +10,7 @@ addons:
 cache:
   directories:
   - node_modules
+  - $HOME/.npm
 before_install:
 - openssl aes-256-cbc -K $encrypted_a10dcc10ccec_key -iv $encrypted_a10dcc10ccec_iv
   -in ./.travis/id_rsa.enc -out ~/.ssh/id_rsa -d
@@ -22,7 +23,5 @@ script:
 - npm run ci
 after_script:
 - npminstall codecov && codecov
-- pwd
 after_success:
-- ssh $USER@$IP -o StrictHostKeyChecking=no 'cd /www/code/Ts-Egg-Mongoose-GraphQL
-  && sh setup.sh'
+- ssh $USER@$IP -o StrictHostKeyChecking=no 'cd /www/code/Ts-Egg-Mongoose-GraphQL && sh setup.sh'
