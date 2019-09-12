@@ -3,7 +3,7 @@
 使用 TypeScript + Egg.js + Mongoose + GraphQL 搭建的开发框架
 
 [![Build Status](https://travis-ci.org/lentoo/Ts-Egg-Mongoose-GraphQL.svg?branch=master)](https://travis-ci.org/lentoo/Ts-Egg-Mongoose-GraphQL)
-
+[![codecov](https://codecov.io/gh/lentoo/Ts-Egg-Mongoose-GraphQL/branch/master/graph/badge.svg)](https://codecov.io/gh/lentoo/Ts-Egg-Mongoose-GraphQL)
 ## QuickStart
 
 ### Development
