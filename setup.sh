@@ -1,6 +1,12 @@
-pwd
+echo "======================   start setup.sh   ======================"
 
-ls
+if [ "${TRAVIS_PULL_REQUEST}" = false ]; then
+  echo "======================   master push   ======================"
+fi
+if [ "${TRAVIS_PULL_REQUEST}" != false ]; then
+  echo "======================   push request   ======================"
+fi
+
 
 # docker-compose stop
 # docker-compose rm -f
