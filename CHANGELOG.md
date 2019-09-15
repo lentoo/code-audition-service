@@ -1,3 +1,10 @@
+## <small>0.0.5 (2019-09-15)</small>
+
+* Release 0.0.5 ([aaccc26](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/commit/aaccc26))
+* feat: 🎸 新增题目管理接口 ([9042dd5](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/commit/9042dd5))
+
+
+
 ## 0.0.1 (2019-09-11)
 
 
