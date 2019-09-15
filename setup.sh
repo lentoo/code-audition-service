@@ -1,15 +1,20 @@
-echo "======================   start setup.sh ${TRAVIS_BRANCH}  ======================"
+echo "======================   start setup.sh======================"
 
-if [ "${TRAVIS_PULL_REQUEST}" = false ]; then
-  echo "======================   master push   ======================"
-fi
-if [ "${TRAVIS_PULL_REQUEST}" != false ]; then
-  echo "======================   push request   ======================"
-fi
+# if [ "${TRAVIS_PULL_REQUEST}" = false ]; then
+#   echo "======================   master push   ======================"
+# fi
+# if [ "${TRAVIS_PULL_REQUEST}" != false ]; then
+#   echo "======================   push request   ======================"
+# fi
 
-echo "======================   end setup.sh   ======================"
+git status
 
+git pull origin master
 
+docker-compose -f docker-compose.test.yml build --force-rm --compress
+docker-compose -f docker-compose.test.yml restart
+
+echo "======================   end setup.sh   ======================" 
 # docker-compose stop
 # docker-compose rm -f
 # docker rmi egg-code-audition_egg-code-audition

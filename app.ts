@@ -8,4 +8,5 @@ export default async (app: Application) => {
     await app.graphql.init()
   }
   app.logger.info('started')
+  app.mongoose.set('debug', true)
 }

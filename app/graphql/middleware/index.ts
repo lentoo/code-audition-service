@@ -1,4 +1,6 @@
 import { MiddlewareFn } from 'type-graphql'
+import { Context } from 'egg'
+import * as graphqlFields from 'graphql-fields'
 export const RequestLogRecord: MiddlewareFn = async ({ info }, next) => {
   // console.log('RequestLogRecord', arg)
   console.log(`Request Url -> ${info.parentType.name}.${info.fieldName}`)
@@ -20,4 +22,15 @@ export const ErrorResolve: MiddlewareFn = async ({ info }, next) => {
     console.error('error', error)
     throw error
   }
+}
+
+export const Authorization: MiddlewareFn<Context> = async (action, next) => {
+  // const token = action.context.request.header.authorization
+  // const res = await action.context.app.redis.get(token)
+  await next()
+}
+
+export const FieldsMiddleware: MiddlewareFn<Context> = async (action, next) => {
+  action.context.request.body.selectFields = graphqlFields(action.info)
+  await next()
 }

@@ -1,6 +1,14 @@
-import { Typegoose, prop, pre, staticMethod, ModelType } from 'typegoose'
+import {
+  Typegoose,
+  prop,
+  pre,
+  staticMethod,
+  ModelType,
+  InstanceType
+} from 'typegoose'
 import { Field, ObjectType } from 'type-graphql'
 import { PaginationModel } from './Pagination'
+import { DocumentQuery } from 'mongoose'
 
 @pre<BaseModel>('save', function(next) {
   if (!this.createAtDate || this.isNew) {
@@ -20,18 +28,39 @@ export default class BaseModel extends Typegoose {
   @prop()
   @Field()
   updateAtDate?: Date
-
+  /**
+   * @description 分页查询
+   * @author lentoo
+   * @date 2019-09-14
+   * @static
+   * @template T
+   * @param {ModelType<T>} this
+   * @param {*} where 查询条件
+   * @param {number} [page=1] 当前页
+   * @param {number} [limit=10] 页大小
+   * @param {any[]} [populates=[]] 多表查询
+   * @returns
+   * @memberof BaseModel
+   */
   @staticMethod
   static async paginationQuery<T>(
     this: ModelType<T>,
     where: any,
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
+    populates: any[] = []
   ) {
-    const flow = this.find(where)
-
     const count = await this.find(where).countDocuments()
 
+    const flow = this.find(where)
+    /**
+     * Populate
+     */
+    if (populates.length > 0) {
+      populates.map(populate => {
+        flow.populate(populate)
+      })
+    }
     const items = await flow
       .skip((page - 1) * limit)
       .limit(limit)
@@ -44,7 +73,7 @@ export default class BaseModel extends Typegoose {
         limit,
         pages,
         total: count,
-        hasMore: page !== pages
+        hasMore: pages !== 0 && page !== pages
       },
       items
     }

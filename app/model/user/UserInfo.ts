@@ -127,7 +127,16 @@ export class UserInfo extends BaseModel {
     }
     return !!this.likeSorts!.find(sid => String(sid) === sortId)
   }
-
+  /**
+   * @description 判断用户是否存在
+   * @author lentoo
+   * @date 2019-09-12
+   * @static
+   * @param {(ModelType<UserInfo> & typeof UserInfo)} this
+   * @param {string} openId
+   * @returns {boolean}
+   * @memberof UserInfo
+   */
   @staticMethod
   public static async isExist(
     this: ModelType<UserInfo> & typeof UserInfo,
@@ -139,6 +148,26 @@ export class UserInfo extends BaseModel {
     if (!user) {
       throw new Error('用户不存在')
     }
+    return user
+  }
+  /**
+   * @description 根据openId查找用户
+   * @author lentoo
+   * @date 2019-09-12
+   * @static
+   * @param {(ModelType<UserInfo> & typeof UserInfo)} this
+   * @param {string} openId
+   * @returns
+   * @memberof UserInfo
+   */
+  @staticMethod
+  public static async findUserByOpenId(
+    this: ModelType<UserInfo> & typeof UserInfo,
+    openId: string
+  ) {
+    const user = await this.findOne({
+      openId
+    }).exec()
     return user
   }
 }

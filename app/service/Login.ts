@@ -6,7 +6,7 @@
  * @author lentoo <729533020@qq.com>
  *
  * Created at     : 2019-09-09 19:44:00
- * Last modified  : 2019-09-10 11:01:14
+ * Last modified  : 2019-09-12 23:16:39
  */
 import { ActionResponseModel } from '../model/BaseModel'
 import {
@@ -94,6 +94,12 @@ export default class LoginService extends BaseService {
       msg: '登陆失败，请重试'
     }
 
+    const user = await UserInfoModel.findUserByOpenId(ctx.openId)
+
+    if (!user) {
+      return loginFailResponse
+    }
+
     const socketId = await this.app.redis.get(unicode)
     if (!socketId) {
       return loginFailResponse
@@ -109,12 +115,12 @@ export default class LoginService extends BaseService {
       return loginFailResponse
     }
 
-    socket.send(
-      JSON.stringify({
-        code: 1,
-        data: _token
-      })
-    )
+    app.redis.set(_token, JSON.stringify(user), 'EX', 6000 * 60 * 24)
+
+    socket.send({
+      code: 1,
+      data: _token
+    })
     app.redis.del(unicode)
 
     return {

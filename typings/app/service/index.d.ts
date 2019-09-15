@@ -7,6 +7,7 @@ import ExportLogin from '../../../app/service/Login';
 import ExportSort from '../../../app/service/Sort';
 import ExportTest from '../../../app/service/Test';
 import ExportUserInfo from '../../../app/service/UserInfo';
+import ExportQuestionIndex from '../../../app/service/question/index';
 
 declare module 'egg' {
   interface IService {
@@ -15,5 +16,8 @@ declare module 'egg' {
     sort: ExportSort;
     test: ExportTest;
     userInfo: ExportUserInfo;
+    question: {
+      index: ExportQuestionIndex;
+    }
   }
 }

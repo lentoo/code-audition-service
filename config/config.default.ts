@@ -15,7 +15,7 @@ export default (appInfo: EggAppInfo) => {
 
   config.graphql = {
     router: '/graphql',
-    dateScalarMode: 'isoDate'
+    dateScalarMode: 'timestamp'
   }
   config.cors = {
     origin: '*',
@@ -35,7 +35,7 @@ export default (appInfo: EggAppInfo) => {
   }
 
   // add your egg config in here
-  config.middleware = []
+  config.middleware = ['auth']
 
   // add your special config in here
   const bizConfig = {
