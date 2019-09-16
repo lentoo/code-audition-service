@@ -1,11 +1,22 @@
-## <small>0.0.5 (2019-09-15)</small>
-
-* Release 0.0.5 ([aaccc26](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/commit/aaccc26))
-* feat: 🎸 新增题目管理接口 ([9042dd5](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/commit/9042dd5))
+## [0.0.5](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/compare/0.0.4...0.0.5) (2019-09-16)
 
 
+### Features
 
-## 0.0.1 (2019-09-11)
+* 🎸 新增权限控制，退出登陆功能 ([d847360](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/commit/d847360))
+* 🎸 新增题目管理接口 ([9042dd5](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/commit/9042dd5))
+
+
+
+## [0.0.4](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/compare/0.0.3...0.0.4) (2019-09-12)
+
+
+
+## [0.0.3](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/compare/0.0.2...0.0.3) (2019-09-11)
+
+
+
+## [0.0.2](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/compare/33d17e6...0.0.2) (2019-09-11)
 
 
 ### Bug Fixes
