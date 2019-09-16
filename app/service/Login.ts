@@ -6,15 +6,17 @@
  * @author lentoo <729533020@qq.com>
  *
  * Created at     : 2019-09-09 19:44:00
- * Last modified  : 2019-09-12 23:16:39
+ * Last modified  : 2019-09-16 11:51:58
  */
+import * as jwt from 'jsonwebtoken'
 import { ActionResponseModel } from '../model/BaseModel'
 import {
   SUCCESS,
   ERROR,
   WAIT_LOGIN,
   ADMIN,
-  CANCEL_LOGIN
+  CANCEL_LOGIN,
+  SERCRET
 } from '../constants/Code'
 import { SocketManager } from '../io'
 import BaseService from './Base'
@@ -115,12 +117,39 @@ export default class LoginService extends BaseService {
       return loginFailResponse
     }
 
-    app.redis.set(_token, JSON.stringify(user), 'EX', 6000 * 60 * 24)
+    // app.redis.set(_token, JSON.stringify(user), 'EX', 60 * 60 * 24)
+    const clientToken = jwt.sign(
+      {
+        user
+      },
+      SERCRET,
+      {
+        expiresIn: '2 days'
+      }
+    )
+    const serverToken = jwt.sign(
+      {
+        user
+      },
+      SERCRET,
+      {
+        expiresIn: '2 days'
+      }
+    )
+    // client token 两小时过期时间
+    // server token 两天过期时间
+    app.redis.set(clientToken, JSON.stringify(user))
+    // app.redis.set(`${user._id}-st`, serverToken)
 
     socket.send({
       code: 1,
-      data: _token
+      data: JSON.stringify({
+        user,
+        ct: clientToken,
+        st: serverToken
+      })
     })
+
     app.redis.del(unicode)
 
     return {
@@ -147,6 +176,20 @@ export default class LoginService extends BaseService {
     return {
       code: SUCCESS,
       msg: '取消登陆'
+    }
+  }
+  /**
+   * @description 退出登陆
+   * @author lentoo
+   * @date 2019-09-16
+   * @memberof LoginService
+   */
+  public async loginOut(): Promise<ActionResponseModel> {
+    const authorization = this.ctx.req.headers.authorization as string
+    await this.app.redis.del(authorization)
+    return {
+      code: SUCCESS,
+      msg: '已成功退出登陆'
     }
   }
 }

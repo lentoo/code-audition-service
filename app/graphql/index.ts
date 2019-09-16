@@ -4,7 +4,7 @@ import { ApolloServer } from 'apollo-server-koa'
 import { Application } from 'egg'
 import { GraphQLSchema, GraphQLFormattedError, SourceLocation } from 'graphql'
 import { buildSchema } from 'type-graphql'
-import { ErrorResolve } from './middleware'
+import { ErrorResolve, AuthorizationMiddleware } from './middleware'
 
 export interface GraphQLConfig {
   router: string
@@ -36,7 +36,8 @@ export default class GraphQL {
     this.graphqlSchema = await buildSchema({
       resolvers: this.getResolvers(),
       dateScalarMode: this.config.dateScalarMode,
-      globalMiddlewares: [ErrorResolve]
+      globalMiddlewares: [ErrorResolve],
+      authChecker: AuthorizationMiddleware
     })
     const server = new ApolloServer({
       schema: this.graphqlSchema,
@@ -44,6 +45,10 @@ export default class GraphQL {
         const err = new FormatError()
         err.message = error.message
         err.path = error.path
+        if (this.app.config.env === 'local') {
+          err.extensions = error.extensions
+          err.locations = error.locations
+        }
         return err
       },
       tracing: false,

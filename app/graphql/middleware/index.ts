@@ -1,6 +1,9 @@
-import { MiddlewareFn } from 'type-graphql'
+import { MiddlewareFn, AuthChecker } from 'type-graphql'
 import { Context } from 'egg'
 import * as graphqlFields from 'graphql-fields'
+import { UserInfo } from '../../model/user/UserInfo'
+import * as jwt from 'jsonwebtoken'
+import { SERCRET } from '../../constants/Code'
 export const RequestLogRecord: MiddlewareFn = async ({ info }, next) => {
   // console.log('RequestLogRecord', arg)
   console.log(`Request Url -> ${info.parentType.name}.${info.fieldName}`)
@@ -24,10 +27,30 @@ export const ErrorResolve: MiddlewareFn = async ({ info }, next) => {
   }
 }
 
-export const Authorization: MiddlewareFn<Context> = async (action, next) => {
-  // const token = action.context.request.header.authorization
-  // const res = await action.context.app.redis.get(token)
-  await next()
+export const AuthorizationMiddleware: AuthChecker<Context> = async (
+  action,
+  roles
+) => {
+  const authorization = action.context.request.header.authorization
+
+  // const stringifyUser = await action.context.app.redis.get(authorization)
+  console.log('AuthorizationMiddleware', authorization)
+  try {
+    const user = jwt.verify(authorization, SERCRET) as UserInfo
+    const u = await action.context.app.redis.get(authorization)
+    if (u) {
+      const userinfo = JSON.parse(u) as UserInfo
+      if (roles.length > 0) {
+        return roles.some(role => role === userinfo.role)
+      }
+    } else {
+      return false
+    }
+
+    return true
+  } catch (error) {
+    return false
+  }
 }
 
 export const FieldsMiddleware: MiddlewareFn<Context> = async (action, next) => {

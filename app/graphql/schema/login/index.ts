@@ -33,4 +33,9 @@ export class LoginResolver {
   ) {
     return await ctx.service.login.cancelLogin(unicode)
   }
+
+  @Mutation(of => ActionResponseModel)
+  public async loginOut(@Ctx() ctx: Context) {
+    return await ctx.service.login.loginOut()
+  }
 }

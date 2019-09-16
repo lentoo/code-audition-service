@@ -8,7 +8,8 @@ import {
   Arg,
   Query,
   UseMiddleware,
-  Root
+  Root,
+  Authorized
 } from 'type-graphql'
 import { ActionResponseModel } from '../../../model/BaseModel'
 import {
@@ -19,7 +20,7 @@ import {
 import {
   ResolveRequestTime,
   RequestLogRecord,
-  Authorization,
+  AuthorizationMiddleware,
   FieldsMiddleware
 } from '../../middleware'
 
@@ -86,6 +87,7 @@ export class QuestionResolver {
 
   @Query(of => PaginationQuestionResponse)
   @UseMiddleware(ResolveRequestTime, RequestLogRecord)
+  @Authorized()
   public async fetchQuestionList(
     @Ctx() ctx: Context,
     @Arg('page', { nullable: true, defaultValue: 1 }) page: number,

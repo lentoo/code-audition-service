@@ -24,3 +24,5 @@ export const CANCEL_LOGIN = 101
  * 管理员角色
  */
 export const ADMIN = 'admin'
+
+export const SERCRET = 'CODE_SERCRET'
