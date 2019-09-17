@@ -1,4 +1,9 @@
-## [0.0.5](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/compare/0.0.4...0.0.5) (2019-09-16)
+## [0.0.7](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/compare/0.0.4...0.0.7) (2019-09-17)
+
+
+### Bug Fixes
+
+* 🐜 优化登陆逻辑 ([e77f00a](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/commit/e77f00a))
 
 
 ### Features

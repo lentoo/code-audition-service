@@ -58,19 +58,13 @@ describe('test/app/service/User.test.js', () => {
     const { items } = await ctx.service.sort.findSortList()
     assert(items.length > 0)
     sort = items[0]
-    const result = await ctx.service.userInfo.userLikeSort(
-      openId,
-      sort._id!
-    )
-    
+    const result = await ctx.service.userInfo.userLikeSort(sort._id!)
+
     assert(result !== undefined)
   })
 
   it('userUnLikeSort', async () => {
-    const result = await ctx.service.userInfo.userUnLikeSort(
-      openId,
-      sort._id!
-    )
+    const result = await ctx.service.userInfo.userUnLikeSort(sort._id!)
     assert(result !== undefined)
   })
 
