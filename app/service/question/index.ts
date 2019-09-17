@@ -5,7 +5,7 @@
  * @author lentoo <729533020@qq.com>
  *
  * Created at     : 2019-09-12 14:01:54
- * Last modified  : 2019-09-14 19:18:47
+ * Last modified  : 2019-09-17 10:09:56
  */
 
 import { union } from 'lodash'
@@ -64,7 +64,8 @@ export default class QuestionService extends BaseService {
     await model.save()
     return {
       code: SUCCESS,
-      msg: '添加成功'
+      msg: '添加成功',
+      data: model._id
     }
   }
   /**
@@ -115,6 +116,7 @@ export default class QuestionService extends BaseService {
         }
         sort.save()
       })
+      Object.assign(_question, question)
       await _question.save()
     }
     return {
@@ -256,16 +258,30 @@ export default class QuestionService extends BaseService {
         $in: ids
       }
     }).exec()
-    questions.map(async question => {
-      question.auditStatus = status
-      question.auditInfo = {
-        auditDate: new Date(),
-        auditName: user!.nickName!,
-        auditPersonId: user!._id!,
-        reason
+    if (questions.length === 0) {
+      this.error('题目不存在')
+    }
+    const { err, row } = await QuestionModel.updateMany(
+      {
+        _id: {
+          $in: ids
+        }
+      },
+      {
+        $set: {
+          auditStatus: status,
+          auditInfo: {
+            auditDate: new Date(),
+            auditName: user!.nickName!,
+            auditPersonId: user!._id!,
+            reason
+          }
+        }
       }
-      await question.save()
-    })
+    )
+    if (err) {
+      this.error(err.message)
+    }
     return {
       code: SUCCESS,
       msg: '操作成功'

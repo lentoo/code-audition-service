@@ -8,9 +8,11 @@ export default class BaseService extends Service {
 
   get selectFields(): SelectFields {
     const fields = {}
-    Object.keys(this.ctx.request.body.selectFields).forEach(key => {
-      fields[key] = true
-    })
+    if (this.ctx.request.body && this.ctx.request.body.selectFields) {
+      Object.keys(this.ctx.request.body.selectFields).forEach(key => {
+        fields[key] = true
+      })
+    }
     return fields
   }
 
