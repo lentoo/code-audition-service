@@ -20,7 +20,8 @@ import {
 } from '../constants/Code'
 import { SocketManager } from '../io'
 import BaseService from './Base'
-import { UserInfoModel } from '../model/user/UserInfo'
+import { UserInfoModel, UserInfo } from '../model/user/UserInfo'
+import { InstanceType } from 'typegoose'
 
 // tslint:disable-next-line: no-var-requires
 const nanoid = require('nanoid')
@@ -190,6 +191,52 @@ export default class LoginService extends BaseService {
     return {
       code: SUCCESS,
       msg: '已成功退出登陆'
+    }
+  }
+
+  public async wxLogin(user: UserInfo): Promise<ActionResponseModel> {
+    const openId = user.openId!
+
+    let u: InstanceType<UserInfo> | null
+    try {
+      u = await this.ctx.service.userInfo.findUserByOpenId(openId)
+    } catch (error) {
+      u = null
+    }
+    if (!u) {
+      const userModel = new UserInfoModel()
+      Object.assign(userModel, user)
+      userModel.openId = openId
+      userModel.role = 'user'
+      u = await userModel.save()
+    }
+
+    const authorizationToken = jwt.sign(
+      {
+        _id: u._id,
+        nickName: user.nickName,
+        gender: user.gender,
+        avatarUrl: user.avatarUrl
+      },
+      SERCRET,
+      {
+        expiresIn: '2 days'
+      }
+    )
+    const serverAuthorizationToken = jwt.sign(
+      {
+        openId: user.openId,
+        role: user.role
+      },
+      SERCRET,
+      { expiresIn: '7 days' }
+    )
+    this.app.redis.set(authorizationToken, JSON.stringify(u))
+    this.app.redis.set(u._id, serverAuthorizationToken)
+    return {
+      code: SUCCESS,
+      msg: '登陆成功',
+      data: authorizationToken
     }
   }
 }

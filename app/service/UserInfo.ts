@@ -15,6 +15,8 @@ import {
 } from '../model/user/UserInfo'
 import { SortModel } from '../model/sort/Sort'
 import BaseService from './Base'
+import { ActionResponseModel } from '../model/BaseModel'
+import { SUCCESS } from '../constants/Code'
 /**
  * UserInfo Service
  */
@@ -81,8 +83,9 @@ export default class UserInfoService extends BaseService {
     })
   }
 
-  public async userLikeSort(openId: string, sortId: string) {
-    const user = await UserInfoModel.isExist(openId)
+  public async userLikeSort(sortId: string): Promise<ActionResponseModel> {
+    const u = await this.ctx.currentUserInfo()
+    const user = await UserInfoModel.isExist(u!.openId!)
     const sort = await SortModel.findById(sortId)
     if (sort) {
       if (user.isLikeSortBySortId(String(sort._id))) {
@@ -92,14 +95,20 @@ export default class UserInfoService extends BaseService {
         sort.attentionNum! += 1
       }
       sort.save()
-      return await user.save()
+      await user.save()
     } else {
       this.error('分类不存在')
     }
+    return {
+      code: SUCCESS,
+      msg: '关注成功',
+      data: user._id
+    }
   }
 
-  public async userUnLikeSort(openId: string, sortId: string) {
-    const user = await UserInfoModel.isExist(openId)
+  public async userUnLikeSort(sortId: string): Promise<ActionResponseModel> {
+    const u = await this.ctx.currentUserInfo()
+    const user = await UserInfoModel.isExist(u!.openId!)
     const sort = await SortModel.findById(sortId)
     if (sort) {
       if (user.isLikeSortBySortId(String(sort._id))) {
@@ -114,9 +123,14 @@ export default class UserInfoService extends BaseService {
         this.error(`用户未关注该分类: ${sort.sortName}`)
       }
       sort.save()
-      return await user.save()
+      await user.save()
     } else {
       this.error('分类不存在')
+    }
+    return {
+      code: SUCCESS,
+      msg: '取消关注成功',
+      data: user._id
     }
   }
 }

@@ -1,4 +1,4 @@
-import { MiddlewareFn, AuthChecker } from 'type-graphql'
+import { MiddlewareFn, AuthChecker, Ctx } from 'type-graphql'
 import { Context } from 'egg'
 import * as graphqlFields from 'graphql-fields'
 import { UserInfo } from '../../model/user/UserInfo'
@@ -31,25 +31,66 @@ export const AuthorizationMiddleware: AuthChecker<Context> = async (
   action,
   roles
 ) => {
-  const authorization = action.context.request.header.authorization
-
-  // const stringifyUser = await action.context.app.redis.get(authorization)
-  console.log('AuthorizationMiddleware', authorization)
-  try {
-    const user = jwt.verify(authorization, SERCRET) as UserInfo
-    const u = await action.context.app.redis.get(authorization)
-    if (u) {
-      const userinfo = JSON.parse(u) as UserInfo
-      if (roles.length > 0) {
-        return roles.some(role => role === userinfo.role)
+  const isWx = !!action.context.req.headers['header-key']
+  if (isWx) {
+    const token = action.context.req.headers['header-key'] as string
+    try {
+      const user = jwt.verify(token, SERCRET)
+    } catch (error) {
+      // if error name is TokenExpiredError
+      if (error.name === 'TokenExpiredError') {
+        // if server token not expired
+        const userStringify = await action.context.app.redis.get(token)
+        if (userStringify) {
+          const u = JSON.parse(userStringify) as UserInfo
+          const serverToken = await action.context.app.redis.get(u._id!)
+          try {
+            const user = jwt.verify(serverToken!, SERCRET)
+            // auto regenerate
+            const newToken = jwt.sign(u, SERCRET, { expiresIn: '2 days' })
+            // auto regenerate
+            const newServerToken = jwt.sign(user, SERCRET, {
+              expiresIn: '7 days'
+            })
+            // delete old token
+            action.context.app.redis.del(token)
+            action.context.app.redis.del(u._id!)
+            // save new token
+            action.context.app.redis.set(newToken, userStringify)
+            action.context.app.redis.set(u._id!, newServerToken)
+            // set request header
+            action.context.req.headers['header-key'] = newToken
+            // set response header
+            action.context.res.setHeader('x-refresh-authorization', newToken)
+          } catch (error) {
+            return false
+          }
+          return true
+        }
+        return false
       }
-    } else {
       return false
     }
-
     return true
-  } catch (error) {
-    return false
+  } else {
+    const authorization = action.context.request.header.authorization
+    console.log('AuthorizationMiddleware', authorization)
+    try {
+      const user = jwt.verify(authorization, SERCRET) as UserInfo
+      const u = await action.context.app.redis.get(authorization)
+      if (u) {
+        const userinfo = JSON.parse(u) as UserInfo
+        if (roles.length > 0) {
+          return roles.some(role => role === userinfo.role)
+        }
+      } else {
+        return false
+      }
+
+      return true
+    } catch (error) {
+      return false
+    }
   }
 }
 

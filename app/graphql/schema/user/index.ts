@@ -11,8 +11,9 @@ import {
 import { Context } from 'egg'
 import { UserInfo, PaginationUserResponse } from '../../../model/user/UserInfo'
 import { RequestLogRecord, ResolveRequestTime } from '../../middleware'
+import { ActionResponseModel } from '../../../model/BaseModel'
 @InputType({ description: '新增用户类型' })
-class AddUserProp {
+export class AddUserProp {
   @Field({ nullable: false })
   nickName: string
   @Field({ nullable: false })
@@ -27,6 +28,8 @@ class AddUserProp {
   city: string
   @Field({ nullable: true })
   language: string
+  @Field({ nullable: true })
+  openId: string
 }
 
 @Resolver(() => UserInfo)
@@ -59,15 +62,13 @@ export class UserInfoResolver {
     return await ctx.service.userInfo.saveUserInfo(u)
   }
 
-  @Mutation(() => UserInfo, { name: 'likeSort' })
+  @Mutation(() => ActionResponseModel, { name: 'likeSort' })
   async likeSort(@Ctx() ctx: Context, @Arg('sortId') sortId: string) {
-    const openId = ctx.headers['header-key']
-    return await ctx.service.userInfo.userLikeSort(openId, sortId)
+    return await ctx.service.userInfo.userLikeSort(sortId)
   }
 
-  @Mutation(() => UserInfo, { name: 'unLikeSort' })
+  @Mutation(() => ActionResponseModel, { name: 'unLikeSort' })
   async unLikeSort(@Ctx() ctx: Context, @Arg('sortId') sortId: string) {
-    const openId = ctx.headers['header-key']
-    return await ctx.service.userInfo.userUnLikeSort(openId, sortId)
+    return await ctx.service.userInfo.userUnLikeSort(sortId)
   }
 }
