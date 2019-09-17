@@ -1,22 +1,27 @@
-echo "======================   start setup.sh======================"
-env = "local"
-# if [ "${TRAVIS_PULL_REQUEST}" = false ]; then
-#   echo "======================   master push   ======================"
-# fi
-# if [ "${TRAVIS_PULL_REQUEST}" != false ]; then
-#   echo "======================   push request   ======================"
-# fi
+env=$1
+echo ${env}
+dockerComposeFile=""
+if [ "${env}" == 'dev' ]
+  then
+    dockerComposeFile="docker-compose.yml"
+  else 
+    dockerComposeFile="docker-compose.test.yml"
+fi
 
-git status
+echo "====================== start setup.${env}.sh ======================"
 
-git pull origin master
+echo "====================== use ${dockerComposeFile} ======================"
 
-docker-compose -f docker-compose.test.yml build --force-rm --compress
-docker-compose -f docker-compose.test.yml up -d
+docker-compose -f ${dockerComposeFile} build --force-rm --compress
 
-echo "======================   end setup.sh   ======================" 
-# docker-compose stop
-# docker-compose rm -f
-# docker rmi egg-code-audition_egg-code-audition
-# docker-compose up -d
+docker-compose up -d
+# 删除 none 镜像
+docker ps -a | grep "Exited" | awk '{print $1 }'|xargs docker stop
+
+docker ps -a | grep "Exited" | awk '{print $1 }'|xargs docker rm
+
+docker images|grep none|awk '{print $3 }'|xargs docker rmi
+
+
+echo "====================== end setup.${env}.sh ======================" 
 
