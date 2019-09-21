@@ -5,7 +5,7 @@
  * @author lentoo <729533020@qq.com>
  *
  * Created at     : 2019-09-09 19:43:20
- * Last modified  : 2019-09-09 19:50:39
+ * Last modified  : 2019-09-17 20:29:18
  */
 
 import {
@@ -21,21 +21,15 @@ import { SUCCESS } from '../constants/Code'
  * UserInfo Service
  */
 export default class UserInfoService extends BaseService {
-  /**
-   * sayHi to you
-   */
   public async saveUserInfo(u: UserInfo) {
-    const headerKey = this.ctx.headers['header-key']
     let user
     try {
-      user = await this.findUserByOpenId(headerKey)
+      user = await this.findUserByOpenId(u.openId!)
     } catch (error) {
       user = new UserInfoModel()
     }
 
     Object.assign(user, u)
-
-    user.openId = headerKey
 
     return await user.save()
   }

@@ -1,14 +1,5 @@
-import {
-  Typegoose,
-  prop,
-  pre,
-  staticMethod,
-  ModelType,
-  InstanceType
-} from 'typegoose'
+import { Typegoose, prop, pre, staticMethod, ModelType } from 'typegoose'
 import { Field, ObjectType } from 'type-graphql'
-import { PaginationModel } from './Pagination'
-import { DocumentQuery } from 'mongoose'
 
 @pre<BaseModel>('save', function(next) {
   if (!this.createAtDate || this.isNew) {
@@ -24,10 +15,10 @@ export default class BaseModel extends Typegoose {
   _id?: string
   @prop()
   @Field()
-  createAtDate?: Date
+  createAtDate: Date
   @prop()
   @Field()
-  updateAtDate?: Date
+  updateAtDate: Date
   /**
    * @description 分页查询
    * @author lentoo

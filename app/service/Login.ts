@@ -6,7 +6,7 @@
  * @author lentoo <729533020@qq.com>
  *
  * Created at     : 2019-09-09 19:44:00
- * Last modified  : 2019-09-16 11:51:58
+ * Last modified  : 2019-09-18 09:45:03
  */
 import * as jwt from 'jsonwebtoken'
 import { ActionResponseModel } from '../model/BaseModel'
@@ -186,8 +186,12 @@ export default class LoginService extends BaseService {
    * @memberof LoginService
    */
   public async loginOut(): Promise<ActionResponseModel> {
-    const authorization = this.ctx.req.headers.authorization as string
+    const authorization = this.ctx.authorizationToken
+    const user = await this.ctx.currentUserInfo()
+    this.app.redis.del(user!._id!)
+
     await this.app.redis.del(authorization)
+
     return {
       code: SUCCESS,
       msg: '已成功退出登陆'
@@ -210,7 +214,6 @@ export default class LoginService extends BaseService {
       userModel.role = 'user'
       u = await userModel.save()
     }
-
     const authorizationToken = jwt.sign(
       {
         _id: u._id,
@@ -225,14 +228,17 @@ export default class LoginService extends BaseService {
     )
     const serverAuthorizationToken = jwt.sign(
       {
+        _id: u._id,
         openId: user.openId,
-        role: user.role
+        role: u.role
       },
       SERCRET,
       { expiresIn: '7 days' }
     )
-    this.app.redis.set(authorizationToken, JSON.stringify(u))
-    this.app.redis.set(u._id, serverAuthorizationToken)
+    await Promise.all([
+      this.app.redis.set(authorizationToken, JSON.stringify(u)),
+      this.app.redis.set(u._id, serverAuthorizationToken)
+    ])
     return {
       code: SUCCESS,
       msg: '登陆成功',

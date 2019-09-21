@@ -11,7 +11,15 @@ export default {
   get isPc(this: Context) {
     return !!this.header.authorization
   },
-
+  get authorizationToken(this: Context) {
+    let token = ''
+    if (this.headers['header-key']) {
+      token = this.headers['header-key']
+    } else {
+      token = this.header.authorization
+    }
+    return token
+  },
   async currentUserInfo(this: Context): Promise<UserInfo | null> {
     let token = ''
     if (this.headers['header-key']) {

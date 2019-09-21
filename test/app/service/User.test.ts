@@ -2,18 +2,22 @@ import * as assert from 'assert'
 import { Context } from 'egg'
 import { app } from 'egg-mock/bootstrap'
 import { Sort } from '../../../app/model/sort/Sort'
+import { token } from '../config'
+import { SUCCESS } from '../../../app/constants/Code'
 
 describe('test/app/service/User.test.js', () => {
-  let ctx: Context
-  let openId = ''
+  let openId = 'test client openid'
+
   let user
+  let ctx: Context
+
   let sort: Sort
   let pages = 0
+
   before(async () => {
     user = {}
     ctx = app.mockContext()
-    openId = `unit test ${Date.now().toString()}`
-    ctx.headers['header-key'] = openId
+    ctx.headers['header-key'] = token
   })
 
   it('fetchUserList', async () => {
@@ -47,11 +51,17 @@ describe('test/app/service/User.test.js', () => {
     assert(u._id !== undefined)
   })
 
+  // it('test wxLogin', async () => {
+  //   const { data: token } = await ctx.service.login.wxLogin(user)
+  //   console.log('token', token)
+  //   ctx.headers['header-key'] = token
+  // })
+
   it('findUserByOpenId', async () => {
-    const user = await ctx.service.userInfo.findUserByOpenId(openId)
-    assert(user !== undefined)
-    assert(user!.openId === openId)
-    assert(user!.openId === openId)
+    const u = await ctx.service.userInfo.findUserByOpenId(user!.openId)
+    assert(u !== undefined)
+    assert(u!.openId === user!.openId)
+    assert(u!.openId === user!.openId)
   })
 
   it('userLikeSort', async () => {
@@ -66,11 +76,5 @@ describe('test/app/service/User.test.js', () => {
   it('userUnLikeSort', async () => {
     const result = await ctx.service.userInfo.userUnLikeSort(sort._id!)
     assert(result !== undefined)
-  })
-
-  it('Remove userinfo', async () => {
-    const { ok, n } = await ctx.service.userInfo.removeUserById(user._id)
-    assert.ok(ok)
-    assert(n === 1)
   })
 })

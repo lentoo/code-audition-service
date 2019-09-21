@@ -1,7 +1,7 @@
 import * as assert from 'assert'
 import { Context } from 'egg'
 import { app } from 'egg-mock/bootstrap'
-import { Sort } from '../../../app/model/sort/Sort'
+import { token } from '../config'
 
 describe('test/app/service/Sort.test.js', () => {
   let ctx: Context
@@ -10,7 +10,7 @@ describe('test/app/service/Sort.test.js', () => {
   let pages = 0
   before(async () => {
     ctx = app.mockContext()
-    ctx.headers['header-key'] = openId
+    ctx.headers['header-key'] = token
     s = {}
     return app.ready()
   })

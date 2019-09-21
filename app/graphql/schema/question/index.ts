@@ -20,7 +20,6 @@ import {
 import {
   ResolveRequestTime,
   RequestLogRecord,
-  AuthorizationMiddleware,
   FieldsMiddleware
 } from '../../middleware'
 
@@ -118,5 +117,27 @@ export class QuestionResolver {
     @Arg('status') status: AuditStatusType
   ) {
     return ctx.service.question.index.reviewQuestion(_id, status, reason)
+  }
+
+  @Query(of => Question)
+  @Authorized()
+  @UseMiddleware(RequestLogRecord, FieldsMiddleware)
+  public async pushQuestion(@Ctx() ctx: Context) {
+    return await ctx.service.question.index.pushQuestion()
+  }
+  @Mutation(of => ActionResponseModel)
+  @Authorized()
+  @UseMiddleware(RequestLogRecord)
+  public async addIdea(
+    @Ctx() ctx: Context,
+    @Arg('content') content: string,
+    @Arg('questionId') questionId: string,
+    @Arg('tid', { nullable: true }) tid?: string
+  ) {
+    return await ctx.service.question.index.addIdeaByQuestion(
+      questionId,
+      content,
+      tid
+    )
   }
 }

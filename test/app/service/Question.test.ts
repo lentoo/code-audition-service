@@ -2,15 +2,14 @@ import * as assert from 'assert'
 import { Context } from 'egg'
 import { app } from 'egg-mock/bootstrap'
 import { SUCCESS } from '../../../app/constants/Code'
+import { token } from '../config'
 describe('test/app/service/Question.test.js', () => {
   let ctx: Context
   let res
   let question
-  const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7Imxhbmd1YWdlIjoiemhfQ04iLCJyb2xlIjoiYWRtaW4iLCJsaWtlU29ydHMiOlsiNWQ2ZjdjNDMyZDA5MTg1NDAxOWZlM2E1Il0sIl9pZCI6IjVkNzRhYmIyNzg5YzkyODJlNjcxN2MzZiIsIm5pY2tOYW1lIjoibGVudG9vIiwiYXZhdGFyVXJsIjoiaHR0cHM6Ly93eC5xbG9nby5jbi9tbW9wZW4vdmlfMzIvcHFFRXRzaHRWRDMxbG90Z1ViaWNDaWJZQ3ZOWDBuMUcyem5RcnY5TThoT2RDOGtSTzFpYTlLREZwOXpIUVZFQ1hsN2xrZWVCMTBNaGZDTVkxa2VpYkllWUtnLzEzMiIsImdlbmRlciI6IjEiLCJwcm92aW5jZSI6Ikd1YW5nZG9uZyIsImNvdW50cnkiOiJDaGluYSIsImNpdHkiOiJKaWV5YW5nIiwib3BlbklkIjoib1oySmQ1UmRZZEVyVmozNks3ZER1dlhUbEdGUSIsInVwZGF0ZUF0RGF0ZSI6IjIwMTktMDktMDhUMTM6MzE6NDQuMjA1WiIsImNyZWF0ZUF0RGF0ZSI6IjIwMTktMDktMDhUMDc6MjA6MTguNzg2WiIsIl9fdiI6MX0sImlhdCI6MTU2ODYzNzI1NywiZXhwIjoxNTY4ODEwMDU3fQ.gsXuBTEgThclRpn0Er8r4AcGpA1z-Y1ZKBn3PaG_cLE`
   before(async () => {
     ctx = app.mockContext()
-    ctx.header.authorization = token
-    // ctx.headers['header-key'] = openId
+    ctx.headers['header-key'] = token
     return app.ready()
   })
 
@@ -64,12 +63,18 @@ describe('test/app/service/Question.test.js', () => {
   })
 
   it('test update question item', async () => {
-    question.title = 'test update question'
-    await ctx.service.question.index.updateQuestion(question, question.sort)
-
     const item = await ctx.service.question.index.fetchQuestion(question._id!)
+    item!.title = 'test update question'
+    await ctx.service.question.index.updateQuestion(
+      item!,
+      item!.sort.map(s => String(s))
+    )
 
-    assert(item!.title === question.title)
+    const newItem = await ctx.service.question.index.fetchQuestion(
+      question._id!
+    )
+
+    assert(newItem!.title === 'test update question')
   })
 
   it('test review question item', async () => {
@@ -99,5 +104,9 @@ describe('test/app/service/Question.test.js', () => {
     } catch (error) {
       assert(error.message === '题目不存在')
     }
+  })
+
+  it('test push question item', async () => {
+    await ctx.service.question.index.pushQuestion()
   })
 })

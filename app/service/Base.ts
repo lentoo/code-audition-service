@@ -1,5 +1,5 @@
 import { Service } from 'egg'
-import { UserInfo } from '../model/user/UserInfo'
+import { UserInfo, UserInfoModel } from '../model/user/UserInfo'
 
 export default class BaseService extends Service {
   error(msg: string) {
@@ -17,15 +17,15 @@ export default class BaseService extends Service {
   }
 
   async getCurrentUser(): Promise<UserInfo | null> {
-    const authorization = this.ctx.header.authorization
-    let user
-    const res = await this.app.redis.get(authorization)
-    if (res) {
-      user = JSON.parse(res)
-    } else {
-      return null
+    return await this.ctx.currentUserInfo()
+  }
+  async getAuthUser() {
+    const u = await this.getCurrentUser()
+    const user = await UserInfoModel.findById(u!._id)
+    if (!user) {
+      this.error('用户不存在')
     }
-    return user
+    return user!
   }
 }
 

@@ -47,8 +47,8 @@ export class AuditInfo {
 export enum AuditStatusType {
   '待审核' = 1000,
   '正在审核' = 1001,
-  '已驳回' = 2000,
-  '已通过' = 3000
+  '已驳回' = 3000,
+  '已通过' = 2000
 }
 
 @ObjectType()
@@ -76,6 +76,23 @@ export class Question extends BaseModel {
   @prop({ required: false })
   @Field({ nullable: true })
   answerOfmarkdown: string
+  /**
+   * @description 浏览量
+   * @type {number}
+   * @memberof Question
+   */
+  @prop({ required: false, default: 0 })
+  @Field({ nullable: true })
+  browse: number
+
+  /**
+   * @description 收藏数
+   * @type {number}
+   * @memberof Question
+   */
+  @prop({ default: 0 })
+  @Field({ nullable: true })
+  collectionNum: number
   /**
    * @description 审核状态
    * 1000 => 审核中
@@ -109,9 +126,16 @@ export class Question extends BaseModel {
    * @type {Ref<Sort>[]}
    * @memberof Question
    */
-  @arrayProp({ itemsRef: Sort, items: String, default: [] })
+  @arrayProp({ itemsRef: Sort, default: [] })
   @Field(type => [Sort])
   sort: Ref<Sort>[]
+  /**
+   * @description 推送时使用，用于用户是否收藏了该题目
+   * @type {boolean}
+   * @memberof Question
+   */
+  @Field({ nullable: true })
+  isCollection: boolean
 }
 
 const questionModel = new Question().getModelForClass(Question)

@@ -14,7 +14,7 @@ echo "====================== use ${dockerComposeFile} ======================"
 
 docker-compose -f ${dockerComposeFile} build --force-rm --compress
 
-docker-compose up -d
+docker-compose -f ${dockerComposeFile} up -d
 # 删除 none 镜像
 docker ps -a | grep "Exited" | awk '{print $1 }'|xargs docker stop
 

@@ -7,14 +7,17 @@ import {
   InstanceType,
   arrayProp,
   staticMethod,
-  ModelType
+  ModelType,
+  index
 } from 'typegoose'
 import BaseModel from '../BaseModel'
 import { PaginationResponseFactory } from '../Pagination'
 import { ObjectType, Field } from 'type-graphql'
 import { Sort } from '../sort/Sort'
+import { Question } from '../question/Question'
 
 @ObjectType()
+@index('openId', { unique: true, background: true })
 export class UserInfo extends BaseModel {
   /**
    * @description 用户微信openid
@@ -86,9 +89,13 @@ export class UserInfo extends BaseModel {
   @Field({ nullable: true })
   role?: string
 
-  @arrayProp({ itemsRef: Sort, items: String })
+  @arrayProp({ itemsRef: Sort })
   @Field(type => [Sort], { nullable: true })
   likeSorts?: Ref<Sort>[]
+
+  @arrayProp({ itemsRef: Question, items: String, default: [] })
+  @Field(type => [Question], { nullable: true })
+  brushedQuestions: Ref<Question>[]
   /**
    * @description 用户关注分类
    * @author lentoo

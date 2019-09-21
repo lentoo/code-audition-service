@@ -45,13 +45,19 @@ export const AuthorizationMiddleware: AuthChecker<Context> = async (
           const u = JSON.parse(userStringify) as UserInfo
           const serverToken = await action.context.app.redis.get(u._id!)
           try {
-            const user = jwt.verify(serverToken!, SERCRET)
+            const user = jwt.verify(serverToken!, SERCRET) as UserInfo
             // auto regenerate
             const newToken = jwt.sign(u, SERCRET, { expiresIn: '2 days' })
             // auto regenerate
-            const newServerToken = jwt.sign(user, SERCRET, {
-              expiresIn: '7 days'
-            })
+            const newServerToken = jwt.sign(
+              {
+                openId: user.openId
+              },
+              SERCRET,
+              {
+                expiresIn: '7 days'
+              }
+            )
             // delete old token
             action.context.app.redis.del(token)
             action.context.app.redis.del(u._id!)

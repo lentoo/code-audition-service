@@ -1,4 +1,12 @@
-import { Field, ObjectType, ClassType } from 'type-graphql'
+import { Field, ObjectType, ClassType, InputType } from 'type-graphql'
+
+@InputType()
+export class PaginationProp {
+  @Field({ nullable: true, defaultValue: 1, description: '页码' })
+  page: number
+  @Field({ nullable: true, defaultValue: 20, description: '页大小' })
+  limit: number
+}
 
 @ObjectType()
 export class PaginationModel {
