@@ -1,3 +1,12 @@
+## [0.0.8](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/compare/0.0.7...0.0.8) (2019-09-21)
+
+
+### Features
+
+* 🎸 新增题目推送，题目收藏功能 ([9caf9ba](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/commit/9caf9ba))
+
+
+
 ## [0.0.7](https://github.com/lentoo/Ts-Egg-Mongoose-GraphQL/compare/0.0.4...0.0.7) (2019-09-17)
 
 
