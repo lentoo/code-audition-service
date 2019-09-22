@@ -34,13 +34,20 @@ export const AuthorizationMiddleware: AuthChecker<Context> = async (
   const isWx = !!action.context.req.headers['header-key']
   if (isWx) {
     const token = action.context.req.headers['header-key'] as string
+
+    const userStringify = await action.context.app.redis.get(token)
+
+    if (!userStringify) {
+      return false
+    }
     try {
+      // action.context.app.redis.get(token)
       const user = jwt.verify(token, SERCRET)
     } catch (error) {
       // if error name is TokenExpiredError
       if (error.name === 'TokenExpiredError') {
         // if server token not expired
-        const userStringify = await action.context.app.redis.get(token)
+
         if (userStringify) {
           const u = JSON.parse(userStringify) as UserInfo
           const serverToken = await action.context.app.redis.get(u._id!)

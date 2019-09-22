@@ -1,4 +1,11 @@
-import { Ctx, Arg, Mutation, Resolver, UseMiddleware } from 'type-graphql'
+import {
+  Ctx,
+  Arg,
+  Mutation,
+  Resolver,
+  UseMiddleware,
+  Authorized
+} from 'type-graphql'
 import { Context } from 'egg'
 import { ActionResponseModel } from '../../../model/BaseModel'
 import { RequestLogRecord } from '../../middleware'
@@ -9,6 +16,7 @@ import { UserInfo } from '../../../model/user/UserInfo'
 export class LoginResolver {
   @Mutation(of => ActionResponseModel)
   @UseMiddleware(RequestLogRecord)
+  @Authorized()
   public async scanLogin(
     @Ctx() ctx: Context,
     @Arg('unicode', { nullable: false }) unicode: string,
@@ -19,6 +27,7 @@ export class LoginResolver {
 
   @Mutation(of => ActionResponseModel)
   @UseMiddleware(RequestLogRecord)
+  @Authorized()
   public async confirmLogin(
     @Ctx() ctx: Context,
     @Arg('unicode', { nullable: false }) unicode: string,
@@ -29,6 +38,7 @@ export class LoginResolver {
 
   @Mutation(of => ActionResponseModel)
   @UseMiddleware(RequestLogRecord)
+  @Authorized()
   public async cancelLogin(
     @Ctx() ctx: Context,
     @Arg('unicode', { nullable: false }) unicode: string
