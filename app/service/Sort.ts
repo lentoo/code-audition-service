@@ -99,7 +99,7 @@ export default class SortService extends BaseService {
     current = 1,
     limit = 10
   ) {
-    let u = await this.ctx.currentUserInfo()
+    const u = await this.ctx.currentUserInfo()
     const user = await this.ctx.service.userInfo.findUserByOpenId(u!.openId!)
     if (user === null) {
       this.error('用户不存在')

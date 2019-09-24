@@ -5,7 +5,7 @@ import { Sort } from '../../../app/model/sort/Sort'
 import { token } from '../config'
 
 describe('test/app/service/User.test.js', () => {
-  let openId = 'test client openid'
+  const openId = 'test client openid'
 
   let user
   let ctx: Context
