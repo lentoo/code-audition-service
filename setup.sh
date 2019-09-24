@@ -1,4 +1,4 @@
-env=$1
+env="$1"
 echo ${env}
 dockerComposeFile=""
 if [ "${env}" == 'dev' ]
