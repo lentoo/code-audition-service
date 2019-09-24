@@ -7,6 +7,7 @@ import ExportLogin from '../../../app/service/Login';
 import ExportSort from '../../../app/service/Sort';
 import ExportTest from '../../../app/service/Test';
 import ExportUserInfo from '../../../app/service/UserInfo';
+import ExportAttentionUserIndex from '../../../app/service/attention-user/Index';
 import ExportCollectionIndex from '../../../app/service/collection/Index';
 import ExportFeedbackIndex from '../../../app/service/feedback/Index';
 import ExportQuestionIdea from '../../../app/service/question/Idea';
@@ -19,6 +20,9 @@ declare module 'egg' {
     sort: ExportSort;
     test: ExportTest;
     userInfo: ExportUserInfo;
+    attentionUser: {
+      index: ExportAttentionUserIndex;
+    }
     collection: {
       index: ExportCollectionIndex;
     }

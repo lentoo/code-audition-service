@@ -4,6 +4,7 @@
 import 'egg';
 import ExportBaseModel from '../../../app/model/BaseModel';
 import ExportPagination from '../../../app/model/Pagination';
+import ExportAttentionUserAttentionUser from '../../../app/model/attention-user/AttentionUser';
 import ExportCollectionCollection from '../../../app/model/collection/Collection';
 import ExportFeedbackFeedBack from '../../../app/model/feedback/FeedBack';
 import ExportQuestionIdea from '../../../app/model/question/Idea';
@@ -15,6 +16,9 @@ declare module 'egg' {
   interface IModel {
     BaseModel: ReturnType<typeof ExportBaseModel>;
     Pagination: ReturnType<typeof ExportPagination>;
+    AttentionUser: {
+      AttentionUser: ReturnType<typeof ExportAttentionUserAttentionUser>;
+    }
     Collection: {
       Collection: ReturnType<typeof ExportCollectionCollection>;
     }

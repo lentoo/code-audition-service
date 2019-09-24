@@ -107,6 +107,7 @@ describe('test/app/service/Question.test.js', () => {
   })
 
   it('test push question item', async () => {
-    await ctx.service.question.index.pushQuestion()
+    const question = await ctx.service.question.index.pushQuestion()
+    assert(question !== null)
   })
 })
