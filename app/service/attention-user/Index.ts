@@ -103,7 +103,7 @@ export default class AttentionUserService extends BaseService {
 
     const fields = this.toProjection(userItemsFields)
 
-    let { page, items } = await AttentionUserModel.paginationQuery(
+    const { page, items } = await AttentionUserModel.paginationQuery(
       {
         user: user._id
       },
@@ -117,37 +117,6 @@ export default class AttentionUserService extends BaseService {
         }
       ]
     )
-    const aggregate = await AttentionUserModel.aggregate([
-      {
-        $match: {
-          attentionUser: {
-            $in: items.map(item => {
-              const u = item.attentionUser as UserInfo
-              return u._id
-            })
-          }
-        }
-      },
-      {
-        $group: {
-          _id: '$attentionUser',
-          count: {
-            $sum: 1
-          }
-        }
-      }
-    ]).exec()
-
-    items = items.map(item => {
-      const attentionUser = item.attentionUser as UserInfo
-      const user =
-        aggregate &&
-        aggregate.find(agg => String(agg._id) === String(attentionUser._id))
-      attentionUser.attentionCount = user.count
-
-      return item
-    })
-
     const response = new PaginationAttentionUserResponse()
 
     response.setData(page, items)
