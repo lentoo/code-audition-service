@@ -10,8 +10,13 @@ import {
 } from 'type-graphql'
 import { Context } from 'egg'
 import { UserInfo, PaginationUserResponse } from '../../../model/user/UserInfo'
-import { RequestLogRecord, ResolveRequestTime } from '../../middleware'
+import {
+  RequestLogRecord,
+  ResolveRequestTime,
+  FieldsMiddleware
+} from '../../middleware'
 import { ActionResponseModel } from '../../../model/BaseModel'
+import { PaginationProp } from '../../../model/Pagination'
 @InputType({ description: '新增用户类型' })
 export class AddUserProp {
   @Field({ nullable: false })
@@ -70,5 +75,20 @@ export class UserInfoResolver {
   @Mutation(() => ActionResponseModel, { name: 'unLikeSort' })
   async unLikeSort(@Ctx() ctx: Context, @Arg('sortId') sortId: string) {
     return await ctx.service.userInfo.userUnLikeSort(sortId)
+  }
+
+  @Query(() => PaginationUserResponse)
+  public findUserByNickName(
+    @Ctx() ctx: Context,
+    @Arg('nickName') nickName: string,
+    @Arg('page') page: PaginationProp
+  ) {
+    return ctx.service.userInfo.findUserByNickName(nickName, page)
+  }
+
+  @Query(() => UserInfo, { description: '根据id查询用户信息' })
+  @UseMiddleware(FieldsMiddleware)
+  public findUserById(@Ctx() ctx: Context, @Arg('id') id: string) {
+    return ctx.service.userInfo.findUserById(id)
   }
 }

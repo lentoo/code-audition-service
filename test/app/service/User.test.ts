@@ -3,7 +3,6 @@ import { Context } from 'egg'
 import { app } from 'egg-mock/bootstrap'
 import { Sort } from '../../../app/model/sort/Sort'
 import { token } from '../config'
-import { SUCCESS } from '../../../app/constants/Code'
 
 describe('test/app/service/User.test.js', () => {
   let openId = 'test client openid'

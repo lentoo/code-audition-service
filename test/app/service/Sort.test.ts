@@ -5,7 +5,6 @@ import { token } from '../config'
 
 describe('test/app/service/Sort.test.js', () => {
   let ctx: Context
-  const openId = '1234567'
   let s: any
   let pages = 0
   before(async () => {

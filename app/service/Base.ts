@@ -9,6 +9,10 @@ export default class BaseService extends Service {
   get selectFields(): SelectFields {
     const fields = {}
     if (this.ctx.request.body && this.ctx.request.body.selectFields) {
+      console.log(
+        'this.ctx.request.body.selectFields',
+        this.ctx.request.body.selectFields
+      )
       Object.keys(this.ctx.request.body.selectFields).forEach(key => {
         fields[key] = true
       })
@@ -26,6 +30,15 @@ export default class BaseService extends Service {
       this.error('用户不存在')
     }
     return user!
+  }
+
+  toProjection(obj) {
+    const objFields = obj
+    const fields = {}
+    Object.keys(objFields).forEach(key => {
+      fields[key] = true
+    })
+    return fields
   }
 }
 

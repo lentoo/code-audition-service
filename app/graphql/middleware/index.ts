@@ -41,8 +41,12 @@ export const AuthorizationMiddleware: AuthChecker<Context> = async (
       return false
     }
     try {
-      // action.context.app.redis.get(token)
-      const user = jwt.verify(token, SERCRET)
+      const redisToken = await action.context.app.redis.get(token)
+      if (redisToken) {
+        jwt.verify(token, SERCRET)
+      } else {
+        return false
+      }
     } catch (error) {
       // if error name is TokenExpiredError
       if (error.name === 'TokenExpiredError') {
@@ -50,27 +54,31 @@ export const AuthorizationMiddleware: AuthChecker<Context> = async (
 
         if (userStringify) {
           const u = JSON.parse(userStringify) as UserInfo
-          const serverToken = await action.context.app.redis.get(u._id!)
+          const serverToken = await action.context.app.redis.get(`st-${u._id!}`)
           try {
             const user = jwt.verify(serverToken!, SERCRET) as UserInfo
             // auto regenerate
-            const newToken = jwt.sign(u, SERCRET, { expiresIn: '2 days' })
+            const newToken = jwt.sign(user, SERCRET, { expiresIn: '2 days' })
             // auto regenerate
-            const newServerToken = jwt.sign(
-              {
-                openId: user.openId
-              },
-              SERCRET,
-              {
-                expiresIn: '7 days'
-              }
-            )
+            const newServerToken = jwt.sign(user, SERCRET, {
+              expiresIn: '7 days'
+            })
             // delete old token
             action.context.app.redis.del(token)
-            action.context.app.redis.del(u._id!)
+            action.context.app.redis.del(`st-${u._id!}`)
             // save new token
-            action.context.app.redis.set(newToken, userStringify)
-            action.context.app.redis.set(u._id!, newServerToken)
+            action.context.app.redis.set(
+              newToken,
+              userStringify,
+              'EX',
+              60 * 60 * 24
+            )
+            action.context.app.redis.set(
+              `st-${u._id!}`,
+              newServerToken,
+              'EX',
+              60 * 60 * 24 * 7
+            )
             // set request header
             action.context.req.headers['header-key'] = newToken
             // set response header

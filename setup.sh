@@ -5,6 +5,7 @@ if [ "${env}" == 'dev' ]
   then
     dockerComposeFile="docker-compose.yml"
   else 
+    git pull origin develop
     dockerComposeFile="docker-compose.test.yml"
 fi
 
