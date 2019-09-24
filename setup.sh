@@ -1,6 +1,11 @@
-env="$1"
+echo "start setup.sh"
+
+env=$1
+
 echo ${env}
+
 dockerComposeFile=""
+
 if [ "${env}" == 'dev' ]
   then
     dockerComposeFile="docker-compose.yml"
