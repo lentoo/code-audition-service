@@ -5,7 +5,13 @@ if [ "${env}" == 'dev' ]
   then
     dockerComposeFile="docker-compose.yml"
   else 
+    git pull origin develop
     dockerComposeFile="docker-compose.test.yml"
+fi
+# master 分支目前不做任何事情
+if [ "${TRAVIS_BRANCH}" == 'master' ]
+  then 
+    exit
 fi
 
 echo "====================== start setup.${env}.sh ======================"

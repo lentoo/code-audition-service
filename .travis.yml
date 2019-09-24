@@ -5,6 +5,7 @@ node_js:
 branchs:
   only:
   - master
+  - develop
 addons:
   ssh_known_hosts: "$IP"
 cache:
