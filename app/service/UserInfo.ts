@@ -17,10 +17,47 @@ import { SortModel } from '../model/sort/Sort'
 import BaseService from './Base'
 import { ActionResponseModel } from '../model/BaseModel'
 import { SUCCESS } from '../constants/Code'
+import { PaginationProp } from '../model/Pagination'
+import { AttentionUserModel } from '../model/attention-user/AttentionUser'
 /**
  * UserInfo Service
  */
 export default class UserInfoService extends BaseService {
+  public async findUserByNickName(
+    nickname: string,
+    pagination: PaginationProp
+  ) {
+    const user = await this.getAuthUser()
+    const { page, items } = await UserInfoModel.paginationQuery(
+      {
+        nickName: {
+          $regex: nickname,
+          $options: '$i'
+        },
+        _id: {
+          $ne: user._id
+        }
+      },
+      pagination.page,
+      pagination.limit
+    )
+    const attentionUserList = await AttentionUserModel.find({
+      user: user._id,
+      attentionUser: {
+        $in: items.map(item => item._id)
+      }
+    }).exec()
+    items.forEach(item => {
+      item.isAttention =
+        attentionUserList.findIndex(
+          u => String(u.attentionUser) === String(item._id)
+        ) > -1
+    })
+    const response = new PaginationUserResponse()
+    response.setData(page, items)
+    return response
+  }
+
   public async saveUserInfo(u: UserInfo) {
     let user
     try {
@@ -33,6 +70,52 @@ export default class UserInfoService extends BaseService {
 
     return await user.save()
   }
+
+  public async findUserById(id: string) {
+    const selfUser = await this.getAuthUser()
+    const user = await UserInfoModel.findById(id, this.selectFields).exec()
+    if (user) {
+      // 当前用户是否关注了该用户
+      const attention = await AttentionUserModel.findOne(
+        {
+          user: selfUser._id,
+          attentionUser: user._id
+        },
+        {
+          _id: 1
+        }
+      ).exec()
+      user.isAttention = !!attention
+      // 当前用户的粉丝数
+      const aggregate = await AttentionUserModel.aggregate([
+        {
+          $match: {
+            attentionUser: user._id
+          }
+        },
+        {
+          $group: {
+            _id: '$_id',
+            count: {
+              $sum: 1
+            }
+          }
+        }
+      ]).exec()
+      if (aggregate.length > 0) {
+        user.fansCount = aggregate[0].count
+      } else {
+        user.fansCount = 0
+      }
+      console.log('aggregate', aggregate)
+      // 当前用户关注的用户数
+      user.attentionCount = await AttentionUserModel.find({
+        user: user._id
+      }).count()
+    }
+    return user
+  }
+
   public async findUserByOpenId(openId: string) {
     const user = await UserInfoModel.findOne({ openId }).exec()
     if (!user) {

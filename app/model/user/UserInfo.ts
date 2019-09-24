@@ -90,12 +90,21 @@ export class UserInfo extends BaseModel {
   role?: string
 
   @arrayProp({ itemsRef: Sort })
-  @Field(type => [Sort], { nullable: true })
+  @Field(type => [Sort], { nullable: true, description: '关注的分类列表' })
   likeSorts?: Ref<Sort>[]
 
   @arrayProp({ itemsRef: Question, items: String, default: [] })
   @Field(type => [Question], { nullable: true })
   brushedQuestions: Ref<Question>[]
+
+  @Field({ nullable: true, description: '关注用户总数', defaultValue: 0 })
+  attentionCount: number
+
+  @Field({ nullable: true, description: '粉丝数', defaultValue: 0 })
+  fansCount: number
+
+  @Field({ nullable: true, description: '是否关注了用户' })
+  isAttention?: boolean
   /**
    * @description 用户关注分类
    * @author lentoo

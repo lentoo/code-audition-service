@@ -121,25 +121,36 @@ export default class LoginService extends BaseService {
     // app.redis.set(_token, JSON.stringify(user), 'EX', 60 * 60 * 24)
     const clientToken = jwt.sign(
       {
-        user
+        _id: user._id,
+        nickName: user.nickName,
+        avatarUrl: user.avatarUrl,
+        city: user.city,
+        role: user.role,
+        province: user.province
       },
       SERCRET,
       {
-        expiresIn: '2 days'
+        expiresIn: '24h'
       }
     )
     const serverToken = jwt.sign(
       {
-        user
+        _id: user._id,
+        nickName: user.nickName,
+        avatarUrl: user.avatarUrl,
+        city: user.city,
+        role: user.role,
+        province: user.province
       },
       SERCRET,
       {
-        expiresIn: '2 days'
+        expiresIn: '7 days'
       }
     )
-    // client token 两小时过期时间
-    // server token 两天过期时间
-    app.redis.set(clientToken, JSON.stringify(user))
+    // client token 24小时过期时间
+    // server token 七天过期时间
+    app.redis.set(clientToken, JSON.stringify(user), 'EX', 60 * 60 * 24)
+    app.redis.set(`st-${user._id}`, serverToken, 'EX', 60 * 60 * 24 * 7)
     // app.redis.set(`${user._id}-st`, serverToken)
 
     socket.send({

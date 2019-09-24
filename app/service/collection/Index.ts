@@ -8,13 +8,8 @@ import {
 } from '../../model/collection/Collection'
 import { ERROR, SUCCESS } from '../../constants/Code'
 import { PaginationProp } from '../../model/Pagination'
-import {
-  PaginationQuestionResponse,
-  QuestionModel,
-  Question
-} from '../../model/question/Question'
-import QuestionService from '../question'
-import { InstanceType, Ref } from 'typegoose'
+import { QuestionModel, Question } from '../../model/question/Question'
+import { InstanceType } from 'typegoose'
 
 export default class CollectionService extends BaseService {
   public async addCollection(name: string): Promise<ActionResponseModel> {
