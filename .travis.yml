@@ -26,4 +26,4 @@ after_script:
 - npminstall codecov && codecov
 - cat ./coverage/lcov.info
 after_success:
-- ssh $USER@$IP -o StrictHostKeyChecking=no 'cd /www/code/egg-code-audition-server && npm run deploy:test"'
+- ssh $USER@$IP -o StrictHostKeyChecking=no 'cd /www/code/egg-code-audition-server && npm run deploy:test'
