@@ -27,8 +27,12 @@ after_script:
 - cat ./coverage/lcov.info
 after_success:
 <<<<<<< HEAD
+<<<<<<< HEAD
 - ssh $USER@$IP -o StrictHostKeyChecking=no 'cd /www/code/egg-code-audition-server && npm run deploy:test'
 =======
   if : branch = develop 
     - ssh $USER@$IP -o StrictHostKeyChecking=no 'cd /www/code/egg-code-audition-server && npm run deploy:test"'
 >>>>>>> update travis.yml
+=======
+- ssh $USER@$IP -o StrictHostKeyChecking=no 'cd /www/code/egg-code-audition-server && npm run deploy:test'
+>>>>>>> update .travis.yml
