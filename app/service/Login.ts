@@ -149,7 +149,12 @@ export default class LoginService extends BaseService {
     )
     // client token 24小时过期时间
     // server token 七天过期时间
-    app.redis.set(clientToken, JSON.stringify(user), 'EX', 60 * 60 * 24)
+    app.redis.set(
+      clientToken,
+      JSON.stringify({ _id: user._id }),
+      'EX',
+      60 * 60 * 24
+    )
     app.redis.set(`st-${user._id}`, serverToken, 'EX', 60 * 60 * 24 * 7)
     // app.redis.set(`${user._id}-st`, serverToken)
 
@@ -247,8 +252,8 @@ export default class LoginService extends BaseService {
       { expiresIn: '7 days' }
     )
     await Promise.all([
-      this.app.redis.set(authorizationToken, JSON.stringify(u)),
-      this.app.redis.set(u._id, serverAuthorizationToken)
+      this.app.redis.set(authorizationToken, JSON.stringify({ _id: u._id })),
+      this.app.redis.set(`st-${u._id}`, serverAuthorizationToken)
     ])
     return {
       code: SUCCESS,
