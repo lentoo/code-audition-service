@@ -21,10 +21,10 @@ export default class IdeaService extends BaseService {
           model: 'UserInfo',
           path: 'userinfo'
         },
-        {
-          model: 'Question',
-          path: 'question'
-        },
+        // {
+        //   model: 'Question',
+        //   path: 'question'
+        // },
         {
           model: 'UserInfo',
           path: 'targetUser'

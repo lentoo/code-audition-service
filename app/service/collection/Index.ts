@@ -46,8 +46,11 @@ export default class CollectionService extends BaseService {
     page: PaginationProp,
     questionId?: string
   ): Promise<PaginationCollectionResponse> {
+    const user = await this.getAuthUser()
     const { items, page: pagination } = await CollectionModel.paginationQuery(
-      {},
+      {
+        userinfo: user._id
+      },
       page.page,
       page.limit,
       [

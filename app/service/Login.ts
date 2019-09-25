@@ -6,7 +6,7 @@
  * @author lentoo <729533020@qq.com>
  *
  * Created at     : 2019-09-09 19:44:00
- * Last modified  : 2019-09-18 09:45:03
+ * Last modified  : 2019-09-22 14:49:29
  */
 import * as jwt from 'jsonwebtoken'
 import { ActionResponseModel } from '../model/BaseModel'
@@ -36,11 +36,10 @@ export default class LoginService extends BaseService {
     unicode: string,
     loginToken: string
   ): Promise<ActionResponseModel> {
-    const { ctx, app } = this
-
-    const openId = ctx.openId
+    const { app } = this
+    const u = await this.getAuthUser()
     const user = await UserInfoModel.findOne({
-      openId
+      _id: u._id
     })
     if (!user) {
       return {
@@ -68,7 +67,7 @@ export default class LoginService extends BaseService {
     if (_loginToken === loginToken) {
       const socket = SocketManager.getSocket(socketId)
       const token = nanoid(32)
-      app.redis.set(openId, token, 'EX', 300)
+      app.redis.set('token-' + user._id, token, 'EX', 300)
       if (socket) {
         socket.send(JSON.stringify({ code: WAIT_LOGIN }))
       }
@@ -96,8 +95,8 @@ export default class LoginService extends BaseService {
       code: ERROR,
       msg: '登陆失败，请重试'
     }
-
-    const user = await UserInfoModel.findUserByOpenId(ctx.openId)
+    const u = await this.getAuthUser()
+    const user = await UserInfoModel.findById(u._id)
 
     if (!user) {
       return loginFailResponse
@@ -112,8 +111,9 @@ export default class LoginService extends BaseService {
     if (!socket) {
       return loginFailResponse
     }
-    const _token = await app.redis.get(ctx.openId)
-    app.redis.del(ctx.openId)
+    const tokenKey = 'token-' + user._id
+    const _token = await app.redis.get(tokenKey)
+    app.redis.del(tokenKey)
     if (_token !== token) {
       return loginFailResponse
     }
@@ -149,7 +149,12 @@ export default class LoginService extends BaseService {
     )
     // client token 24小时过期时间
     // server token 七天过期时间
-    app.redis.set(clientToken, JSON.stringify(user), 'EX', 60 * 60 * 24)
+    app.redis.set(
+      clientToken,
+      JSON.stringify({ _id: user._id }),
+      'EX',
+      60 * 60 * 24
+    )
     app.redis.set(`st-${user._id}`, serverToken, 'EX', 60 * 60 * 24 * 7)
     // app.redis.set(`${user._id}-st`, serverToken)
 
@@ -247,8 +252,8 @@ export default class LoginService extends BaseService {
       { expiresIn: '7 days' }
     )
     await Promise.all([
-      this.app.redis.set(authorizationToken, JSON.stringify(u)),
-      this.app.redis.set(u._id, serverAuthorizationToken)
+      this.app.redis.set(authorizationToken, JSON.stringify({ _id: u._id })),
+      this.app.redis.set(`st-${u._id}`, serverAuthorizationToken)
     ])
     return {
       code: SUCCESS,

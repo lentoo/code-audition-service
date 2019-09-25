@@ -34,6 +34,12 @@ export const AuthorizationMiddleware: AuthChecker<Context> = async (
   const isWx = !!action.context.req.headers['header-key']
   if (isWx) {
     const token = action.context.req.headers['header-key'] as string
+
+    const userStringify = await action.context.app.redis.get(token)
+
+    if (!userStringify) {
+      return false
+    }
     try {
       const redisToken = await action.context.app.redis.get(token)
       if (redisToken) {
@@ -45,7 +51,7 @@ export const AuthorizationMiddleware: AuthChecker<Context> = async (
       // if error name is TokenExpiredError
       if (error.name === 'TokenExpiredError') {
         // if server token not expired
-        const userStringify = await action.context.app.redis.get(token)
+
         if (userStringify) {
           const u = JSON.parse(userStringify) as UserInfo
           const serverToken = await action.context.app.redis.get(`st-${u._id!}`)
