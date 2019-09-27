@@ -39,11 +39,12 @@ export default class BaseModel extends Typegoose {
     where: any,
     page: number = 1,
     limit: number = 10,
-    populates: any[] = []
+    populates: any[] = [],
+    options: any = {}
   ) {
     const count = await this.find(where).countDocuments()
 
-    const flow = this.find(where)
+    let flow = this.find(where)
     /**
      * Populate
      */
@@ -52,10 +53,14 @@ export default class BaseModel extends Typegoose {
         flow.populate(populate)
       })
     }
-    const items = await flow
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .exec()
+    flow = flow.skip((page - 1) * limit).limit(limit)
+    /**
+     *  sort
+     */
+    if (options.sort) {
+      flow.sort(options.sort)
+    }
+    const items = await flow.exec()
     const pages = Math.ceil(count / limit)
 
     return {
