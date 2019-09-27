@@ -48,6 +48,7 @@ export class Feedback extends BaseModel {
   @prop({ trim: true })
   @Field({ description: '反馈内容' })
   content: string
+
   /**
    * @description 反馈图片
    * @type {string[]}
@@ -57,21 +58,42 @@ export class Feedback extends BaseModel {
   @Field(type => [String], { nullable: true, description: '反馈图片' })
   @MaxLength(3)
   images: string[]
+
   /**
    * @description 反馈用户
    * @type {Ref<UserInfo>}
    * @memberof FeedBack
    */
   @prop({ ref: UserInfo })
-  @Field(type => UserInfo, { description: '反馈用户' })
+  @Field(type => UserInfo, { description: '反馈用户', nullable: true })
   feedbackUser: Ref<UserInfo>
 
+  /**
+   * @description 反馈类型
+   * @type {FeedbackType}
+   * @memberof Feedback
+   */
   @prop({ enum: FeedbackType })
   @Field(type => FeedbackType)
   type: FeedbackType
+
+  /**
+   * @description 审核状态
+   * @type {FeedbackStatus}
+   * @memberof Feedback
+   */
   @prop({ enum: FeedbackStatus, default: FeedbackStatus.TO_BE_PROCESSED })
   @Field(type => FeedbackStatus)
   status: FeedbackStatus
+
+  /**
+   * @description 审核内容
+   * @type {string}
+   * @memberof Feedback
+   */
+  @prop({ trim: true })
+  @Field({ nullable: true, description: '审核内容' })
+  resultContent: string
 }
 
 @ArgsType()

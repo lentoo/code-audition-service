@@ -209,7 +209,12 @@ export default class QuestionService extends BaseService {
             }
           }
         }
-      ]
+      ],
+      {
+        sort: {
+          auditStatus: 1
+        }
+      }
     )
     const response = new PaginationQuestionResponse()
     response.setData(page, items)

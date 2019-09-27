@@ -40,4 +40,14 @@ export class FeedbackResolver {
   ) {
     return ctx.service.feedback.index.fetchFeedback(page, type, status, name)
   }
+  @Mutation(type => ActionResponseModel, { description: '审核反馈内容' })
+  @Authorized()
+  public async auditFeedback(
+    @Ctx() ctx: Context,
+    @Arg('id') id: string,
+    @Arg('status', type => FeedbackStatus) status: FeedbackStatus,
+    @Arg('resultContent') resultContent: string
+  ) {
+    return ctx.service.feedback.index.auditFeedback(id, status, resultContent)
+  }
 }
