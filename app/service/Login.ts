@@ -69,7 +69,7 @@ export default class LoginService extends BaseService {
       const token = nanoid(32)
       app.redis.set('token-' + user._id, token, 'EX', 300)
       if (socket) {
-        socket.send(JSON.stringify({ code: WAIT_LOGIN }))
+        socket.send({ code: WAIT_LOGIN })
       }
 
       return {
@@ -159,7 +159,7 @@ export default class LoginService extends BaseService {
     // app.redis.set(`${user._id}-st`, serverToken)
 
     socket.send({
-      code: 1,
+      code: SUCCESS,
       data: JSON.stringify({
         user,
         ct: clientToken,
