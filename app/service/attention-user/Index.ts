@@ -4,11 +4,7 @@ import {
   AttentionUserModel,
   PaginationAttentionUserResponse
 } from '../../model/attention-user/AttentionUser'
-<<<<<<< HEAD
 import { UserInfoModel, UserInfo } from '../../model/user/UserInfo'
-=======
-import { UserInfoModel } from '../../model/user/UserInfo'
->>>>>>> 469891b8cc511e664c0968863c2bdb6572827a3e
 import { SUCCESS, ERROR } from '../../constants/Code'
 import { PaginationProp } from '../../model/Pagination'
 
