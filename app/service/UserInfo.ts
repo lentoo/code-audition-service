@@ -210,7 +210,6 @@ export default class UserInfoService extends BaseService {
       data: user._id
     }
   }
-
   public async findLoginUserInfo() {
     const user = await this.getCurrentUser()
     const fields = await this.selectFields

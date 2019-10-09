@@ -99,12 +99,7 @@ export default class SortService extends BaseService {
     current = 1,
     limit = 10
   ) {
-    const u = await this.ctx.currentUserInfo()
-    const user = await this.ctx.service.userInfo.findUserByOpenId(u!.openId!)
-    if (user === null) {
-      this.error('用户不存在')
-      return
-    }
+    const user = await this.getAuthUser()
     const response = await this.findSortList(name, current, limit)
     // 如果当前用户有关注分类
     if (user.likeSorts) {

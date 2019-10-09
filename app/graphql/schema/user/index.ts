@@ -95,10 +95,9 @@ export class UserInfoResolver {
   public findUserById(@Ctx() ctx: Context, @Arg('id') id: string) {
     return ctx.service.userInfo.findUserById(id)
   }
-
-  @Query(() => UserInfo, { description: '获取当前登陆的用户信息' })
-  @Authorized()
+  @Query(() => UserInfo, { description: '获取登陆用户信息' })
   @UseMiddleware(FieldsMiddleware)
+  @Authorized()
   public findLoginUserInfo(@Ctx() ctx: Context) {
     return ctx.service.userInfo.findLoginUserInfo()
   }
