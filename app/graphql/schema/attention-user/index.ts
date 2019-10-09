@@ -37,15 +37,4 @@ export class AttentionUserResolver {
   ) {
     return ctx.service.attentionUser.index.attentionUserList(page)
   }
-
-  @Query(of => PaginationAttentionUserResponse, {
-    description: '获取关注我的用户列表'
-  })
-  @Authorized()
-  public async attentionSelfUserList(
-    @Ctx() ctx: Context,
-    @Arg('page', { defaultValue: { page: 1, limit: 10 } }) page: PaginationProp
-  ) {
-    return ctx.service.attentionUser.index.attentionSelfUserList(page)
-  }
 }

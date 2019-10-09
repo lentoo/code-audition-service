@@ -6,7 +6,8 @@ import {
   Mutation,
   InputType,
   Field,
-  UseMiddleware
+  UseMiddleware,
+  Authorized
 } from 'type-graphql'
 import { Context } from 'egg'
 import { UserInfo, PaginationUserResponse } from '../../../model/user/UserInfo'
@@ -51,7 +52,10 @@ export class UserInfoResolver {
     return await ctx.service.userInfo.getUserList(id)
   }
 
-  @Query(returns => UserInfo, { name: 'user', description: '查询用户信息' })
+  @Query(returns => UserInfo, {
+    name: 'user',
+    description: '根据OpenId查询用户信息'
+  })
   async fetchUser(@Arg('_id') id: string, @Ctx() ctx: Context) {
     return await ctx.service.userInfo.findUserByOpenId(id)
   }
@@ -90,5 +94,12 @@ export class UserInfoResolver {
   @UseMiddleware(FieldsMiddleware)
   public findUserById(@Ctx() ctx: Context, @Arg('id') id: string) {
     return ctx.service.userInfo.findUserById(id)
+  }
+
+  @Query(() => UserInfo, { description: '获取当前登陆的用户信息' })
+  @Authorized()
+  @UseMiddleware(FieldsMiddleware)
+  public findLoginUserInfo(@Ctx() ctx: Context) {
+    return ctx.service.userInfo.findLoginUserInfo()
   }
 }
