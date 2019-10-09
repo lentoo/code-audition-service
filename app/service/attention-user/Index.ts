@@ -4,7 +4,7 @@ import {
   AttentionUserModel,
   PaginationAttentionUserResponse
 } from '../../model/attention-user/AttentionUser'
-import { UserInfoModel } from '../../model/user/UserInfo'
+import { UserInfoModel, UserInfo } from '../../model/user/UserInfo'
 import { SUCCESS, ERROR } from '../../constants/Code'
 import { PaginationProp } from '../../model/Pagination'
 
@@ -121,6 +121,51 @@ export default class AttentionUserService extends BaseService {
 
     response.setData(page, items)
 
+    return response
+  }
+
+  public async attentionSelfUserList(
+    page: PaginationProp = { page: 1, limit: 10 }
+  ) {
+    const user = await this.getAuthUser()
+    // 关注我的
+    const {
+      page: pagination,
+      items
+    } = await AttentionUserModel.paginationQuery(
+      {
+        attentionUser: user._id
+      },
+      page.page,
+      page.limit,
+      [
+        {
+          path: 'user',
+          model: 'UserInfo'
+        }
+      ]
+    )
+    // 我关注的
+    const attentions = await AttentionUserModel.find({
+      user: user._id,
+      attentionUser: {
+        $in: items.map(item => {
+          const user = item.user as UserInfo
+          return user._id
+        })
+      }
+    }).exec()
+    console.log('attentions', attentions)
+    console.log('items', items)
+    items.forEach(item => {
+      const user = item.user as UserInfo
+      user.isAttention = attentions.some(
+        a => String(a.attentionUser) === String(user._id)
+      )
+      return item
+    })
+    const response = new PaginationAttentionUserResponse()
+    response.setData(pagination, items)
     return response
   }
 }
