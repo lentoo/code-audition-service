@@ -210,4 +210,21 @@ export default class UserInfoService extends BaseService {
       data: user._id
     }
   }
+  public async findLoginUserInfo() {
+    const user = await this.getCurrentUser()
+    const fields = await this.selectFields
+    if (!user) {
+      this.error('用户不存在')
+    }
+    const userinfo = await UserInfoModel.findById(user!._id, fields)
+    if (userinfo) {
+      userinfo.attentionCount = await AttentionUserModel.find({
+        user: userinfo._id
+      }).count()
+      userinfo.fansCount = await AttentionUserModel.find({
+        attentionUser: userinfo._id
+      }).count()
+    }
+    return userinfo
+  }
 }

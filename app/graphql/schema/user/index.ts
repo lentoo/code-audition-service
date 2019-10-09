@@ -6,7 +6,8 @@ import {
   Mutation,
   InputType,
   Field,
-  UseMiddleware
+  UseMiddleware,
+  Authorized
 } from 'type-graphql'
 import { Context } from 'egg'
 import { UserInfo, PaginationUserResponse } from '../../../model/user/UserInfo'
@@ -90,5 +91,11 @@ export class UserInfoResolver {
   @UseMiddleware(FieldsMiddleware)
   public findUserById(@Ctx() ctx: Context, @Arg('id') id: string) {
     return ctx.service.userInfo.findUserById(id)
+  }
+  @Query(() => UserInfo, { description: '获取登陆用户信息' })
+  @UseMiddleware(FieldsMiddleware)
+  @Authorized()
+  public findLoginUserInfo(@Ctx() ctx: Context) {
+    return ctx.service.userInfo.findLoginUserInfo()
   }
 }
