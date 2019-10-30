@@ -26,13 +26,33 @@ after_script:
 - npminstall codecov && codecov
 - cat ./coverage/lcov.info
 after_success:
-<<<<<<< HEAD
-<<<<<<< HEAD
 - ssh $USER@$IP -o StrictHostKeyChecking=no 'cd /www/code/egg-code-audition-server && npm run deploy:test'
-=======
-  if : branch = develop 
-    - ssh $USER@$IP -o StrictHostKeyChecking=no 'cd /www/code/egg-code-audition-server && npm run deploy:test"'
->>>>>>> update travis.yml
-=======
+language: node_js
+sudo: required
+node_js:
+- 10.16.0
+branchs:
+  only:
+  - master
+  - develop
+addons:
+  ssh_known_hosts: "$IP"
+cache:
+  directories:
+  - node_modules
+  - $HOME/.npm
+before_install:
+- openssl aes-256-cbc -K $encrypted_a10dcc10ccec_key -iv $encrypted_a10dcc10ccec_iv
+  -in ./.travis/id_rsa.enc -out ~/.ssh/id_rsa -d
+- eval "$(ssh-agent -s)"
+- chmod 600 ~/.ssh/id_rsa
+- npm i npminstall -g
+install:
+- npminstall
+script:
+- npm run ci
+after_script:
+- npminstall codecov && codecov
+- cat ./coverage/lcov.info
+after_success:
 - ssh $USER@$IP -o StrictHostKeyChecking=no 'cd /www/code/egg-code-audition-server && npm run deploy:test'
->>>>>>> update .travis.yml
