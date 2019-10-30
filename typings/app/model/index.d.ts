@@ -7,6 +7,7 @@ import ExportPagination from '../../../app/model/Pagination';
 import ExportAttentionUserAttentionUser from '../../../app/model/attention-user/AttentionUser';
 import ExportCollectionCollection from '../../../app/model/collection/Collection';
 import ExportFeedbackFeedBack from '../../../app/model/feedback/FeedBack';
+import ExportMessageMessage from '../../../app/model/message/Message';
 import ExportQuestionIdea from '../../../app/model/question/Idea';
 import ExportQuestionQuestion from '../../../app/model/question/Question';
 import ExportSortSort from '../../../app/model/sort/Sort';
@@ -24,6 +25,9 @@ declare module 'egg' {
     }
     Feedback: {
       FeedBack: ReturnType<typeof ExportFeedbackFeedBack>;
+    }
+    Message: {
+      Message: ReturnType<typeof ExportMessageMessage>;
     }
     Question: {
       Idea: ReturnType<typeof ExportQuestionIdea>;
