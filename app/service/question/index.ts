@@ -300,141 +300,11 @@ export default class QuestionService extends BaseService {
   }
 
   public async pushQuestion() {
-    const currentDate = dayjs()
-    const oldDate = currentDate.subtract(4, 'day')
-    const minDate = currentDate.subtract(14, 'day')
-    const user = await this.getAuthUser()
-    if (user.likeSorts!.length === 0) {
-      this.error('你还没有关注分类，先去关注一些你喜欢的分类吧')
+    const loginedUser = await this.ctx.currentUserInfo()
+    if (loginedUser) {
+      return this.getQuestionByLogined()
     }
-
-    const fields = this.selectFields
-    const where = {
-      _id: {
-        $nin: user.brushedQuestions
-      },
-      sort: {
-        $in: user.likeSorts
-      },
-      auditStatus: AuditStatusType.已通过,
-      createAtDate: {
-        $gte: minDate.toDate()
-      }
-    }
-    const flow = QuestionModel.find(where, fields)
-    if (fields.userinfo) {
-      flow.populate({
-        model: 'UserInfo',
-        path: 'userinfo'
-      })
-    }
-    if (fields.sort) {
-      flow.populate({
-        model: 'Sort',
-        path: 'sort'
-      })
-    }
-
-    const questionsPool = await flow.exec()
-    // const oldDate = new Date(year, month, date)
-
-    const oldQuestion = questionsPool.filter(
-      item => item.createAtDate! < oldDate.toDate()
-    )
-    const newQuestion = questionsPool.filter(
-      item => item.createAtDate! >= oldDate.toDate()
-    )
-
-    // const oldQuestionWhere = {
-    //   _id: {
-    //     $nin: user.brushedQuestions
-    //   },
-    //   sort: {
-    //     $in: user.likeSorts
-    //   },
-    //   auditStatus: AuditStatusType.已通过,
-    //   createAtDate: {
-    //     $lt: new Date(year, month, date),
-    //     $gte: new Date(minDate.year(), minDate.month(), minDate.date())
-    //   }
-    // }
-    // const newQuestionWhere = {
-    //   _id: {
-    //     $nin: user.brushedQuestions
-    //   },
-    //   sort: {
-    //     $in: user.likeSorts
-    //   },
-    //   auditStatus: AuditStatusType.已通过,
-    //   createAtDate: {
-    //     $gte: new Date(year, month, date)
-    //   }
-    // }
-    // const oldQuestionFlow = QuestionModel.find(oldQuestionWhere, fields)
-    // const newQuestionFlow = QuestionModel.find(newQuestionWhere, fields)
-    // if (fields.userinfo) {
-    //   oldQuestionFlow.populate({
-    //     model: 'UserInfo',
-    //     path: 'userinfo'
-    //   })
-    //   newQuestionFlow.populate({
-    //     model: 'UserInfo',
-    //     path: 'userinfo'
-    //   })
-    // }
-    // if (fields.sort) {
-    //   oldQuestionFlow.populate({
-    //     model: 'Sort',
-    //     path: 'sort'
-    //   })
-    //   newQuestionFlow.populate({
-    //     model: 'Sort',
-    //     path: 'sort'
-    //   })
-    // }
-    // const [oldQuestion, newQuestion] = await Promise.all([
-    //   oldQuestionFlow.exec(),
-    //   newQuestionFlow.exec()
-    // ])
-    console.log({
-      oldDate: oldDate.format('YYYY-MM-DD')
-    })
-    if (oldQuestion.length === 0 && newQuestion.length === 0) {
-      this.error('已经把所有题都刷完了，你真优秀，欢迎投稿题目')
-    }
-    const question = getRandomQuesiton(oldQuestion, newQuestion)
-    // 浏览量加一
-    question.browse += 1
-    // 查询当前用户是否收藏了该题目
-    const collections = await CollectionModel.findOne(
-      {
-        userinfo: user._id
-      },
-      {
-        _id: 1,
-        questions: 1
-      }
-    ).populate({
-      path: 'questions',
-      model: 'Question',
-      match: {
-        _id: question._id
-      },
-      select: {
-        _id: 1
-      }
-    })
-    // 查看是否收藏
-    question.isCollection = false
-    if (collections) {
-      question.isCollection = collections.questions.length > 0
-    }
-
-    // 方便测试，暂时注释掉
-    // user.brushedQuestions.push(question)
-    await Promise.all([question.save(), user.save()])
-
-    return question
+    return this.getQuestionByNotLogin()
   }
 
   public async addIdeaByQuestion(
@@ -483,6 +353,136 @@ export default class QuestionService extends BaseService {
       code: SUCCESS,
       msg: '回复成功'
     }
+  }
+
+  /**
+   * @description 已经登陆的获取题目推送
+   * @author lentoo
+   * @date 2019-10-30
+   * @returns
+   * @memberof QuestionService
+   */
+  public async getQuestionByLogined() {
+    const currentDate = dayjs()
+    const oldDate = currentDate.subtract(4, 'day')
+    const minDate = currentDate.subtract(14, 'day')
+    const user = await this.getAuthUser()
+    if (user.likeSorts!.length === 0) {
+      this.error('你还没有关注分类，先去关注一些你喜欢的分类吧')
+    }
+
+    const fields = this.selectFields
+    const where = {
+      _id: {
+        $nin: user.brushedQuestions
+      },
+      sort: {
+        $in: user.likeSorts
+      },
+      auditStatus: AuditStatusType.已通过,
+      createAtDate: {
+        $gte: minDate.toDate()
+      }
+    }
+    const flow = QuestionModel.find(where, fields)
+    if (fields.userinfo) {
+      flow.populate({
+        model: 'UserInfo',
+        path: 'userinfo'
+      })
+    }
+    if (fields.sort) {
+      flow.populate({
+        model: 'Sort',
+        path: 'sort'
+      })
+    }
+
+    const questionsPool = await flow.exec()
+    // const oldDate = new Date(year, month, date)
+
+    const oldQuestion = questionsPool.filter(
+      item => item.createAtDate! < oldDate.toDate()
+    )
+    const newQuestion = questionsPool.filter(
+      item => item.createAtDate! >= oldDate.toDate()
+    )
+    console.log({
+      oldDate: oldDate.format('YYYY-MM-DD')
+    })
+    if (oldQuestion.length === 0 && newQuestion.length === 0) {
+      this.error('已经把所有题都刷完了，你真优秀，欢迎投稿题目')
+    }
+    const question = getRandomQuesiton(oldQuestion, newQuestion)
+    // 浏览量加一
+    question.browse += 1
+    // 查询当前用户是否收藏了该题目
+    const collections = await CollectionModel.findOne(
+      {
+        userinfo: user._id
+      },
+      {
+        _id: 1,
+        questions: 1
+      }
+    ).populate({
+      path: 'questions',
+      model: 'Question',
+      match: {
+        _id: question._id
+      },
+      select: {
+        _id: 1
+      }
+    })
+    // 查看是否收藏
+    question.isCollection = false
+    if (collections) {
+      question.isCollection = collections.questions.length > 0
+    }
+
+    // 方便测试，暂时注释掉
+    // user.brushedQuestions.push(question)
+    await Promise.all([question.save(), user.save()])
+
+    return question
+  }
+  /**
+   * @description 未登陆的获取题目推送
+   * @author lentoo
+   * @date 2019-10-30
+   * @memberof QuestionService
+   */
+  public async getQuestionByNotLogin() {
+    // 1. 获取浏览量前20的题目
+    const count = 20
+    // 2. 随机给用户推送
+    const questions = await QuestionModel.find()
+      .sort({
+        browse: 'desc'
+      })
+      .populate({
+        model: 'UserInfo',
+        path: 'userinfo'
+      })
+      .populate({
+        model: 'Sort',
+        path: 'sort'
+      })
+      .limit(count)
+      .exec()
+    const random = Math.random()
+    const randomNum = (questions.length * random).toFixed(0)
+    console.log('randomNum', randomNum)
+    if (questions.length === 0) {
+      this.error('已经把所有题都刷完了，你真优秀，欢迎投稿题目')
+    }
+    const question: InstanceType<Question> =
+      questions[randomNum] || questions[0]
+    question.isCollection = false
+    question.browse += 1
+    question.save()
+    return question
   }
 }
 

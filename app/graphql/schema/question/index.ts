@@ -120,7 +120,6 @@ export class QuestionResolver {
   }
 
   @Query(of => Question)
-  @Authorized()
   @UseMiddleware(RequestLogRecord, FieldsMiddleware)
   public async pushQuestion(@Ctx() ctx: Context) {
     return await ctx.service.question.index.pushQuestion()
