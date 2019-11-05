@@ -24,13 +24,13 @@ export default class AttentionUser extends BaseModel {
   @Field(() => UserInfo, { nullable: true })
   user: Ref<UserInfo>
   /**
-   * @description 关注的用户
+   * @description 关注的用户列表
    * @type {Ref<UserInfo>[]}
    * @memberof AttentionUser
    */
-  @prop({ ref: UserInfo })
-  @Field(() => UserInfo, { nullable: true })
-  attentionUser: Ref<UserInfo>
+  @arrayProp({ itemsRef: UserInfo })
+  @Field(() => [UserInfo], { nullable: true })
+  attentionUserList: Ref<UserInfo>[]
 }
 
 const attentionUserModel = new AttentionUser().getModelForClass(AttentionUser)
