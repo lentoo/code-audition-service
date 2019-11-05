@@ -379,10 +379,10 @@ export default class QuestionService extends BaseService {
       sort: {
         $in: user.likeSorts
       },
-      auditStatus: AuditStatusType.已通过,
-      createAtDate: {
-        $gte: minDate.toDate()
-      }
+      auditStatus: AuditStatusType.已通过
+      // createAtDate: {
+      //   $gte: minDate.toDate()
+      // }
     }
     const flow = QuestionModel.find(where, fields)
     if (fields.userinfo) {

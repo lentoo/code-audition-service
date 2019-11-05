@@ -1,14 +1,29 @@
 import BaseService from '../Base'
 import { ActionResponseModel } from '../../model/BaseModel'
-import {
+import AttentionUser, {
   AttentionUserModel,
   PaginationAttentionUserResponse
 } from '../../model/attention-user/AttentionUser'
-import { UserInfoModel, UserInfo } from '../../model/user/UserInfo'
+import {
+  UserInfoModel,
+  UserInfo,
+  PaginationUserResponse
+} from '../../model/user/UserInfo'
 import { SUCCESS, ERROR } from '../../constants/Code'
 import { PaginationProp } from '../../model/Pagination'
+import { InstanceType } from 'typegoose'
 
 export default class AttentionUserService extends BaseService {
+  public async attentionUserByUid(
+    uid: string,
+    id: string
+  ): Promise<ActionResponseModel> {
+    const user = await UserInfoModel.findById(uid)
+    if (!user) {
+      this.error('用户不存在')
+    }
+    return this.attentionUser(id, user!)
+  }
   /**
    * @description 关注用户
    * @author lentoo
@@ -17,8 +32,11 @@ export default class AttentionUserService extends BaseService {
    * @returns {Promise<ActionResponseModel>}
    * @memberof AttentionUserService
    */
-  public async attentionUser(id: string): Promise<ActionResponseModel> {
-    const user = await this.getAuthUser()
+  public async attentionUser(
+    id: string,
+    user: InstanceType<UserInfo>
+  ): Promise<ActionResponseModel> {
+    // const user = await this.getAuthUser()
     const targetUser = await UserInfoModel.findById(id)
     if (!targetUser) {
       this.error('目标用户不存在')
@@ -26,31 +44,58 @@ export default class AttentionUserService extends BaseService {
     if (targetUser && String(targetUser._id) === String(user._id)) {
       this.error('不能关注自己')
     }
-    let attentionUser = await AttentionUserModel.findOne({
-      user: user._id,
-      attentionUser: targetUser!._id
+    const attentionUserRecord = await AttentionUserModel.findOne({
+      user: user._id
     }).exec()
-
-    if (!attentionUser) {
-      attentionUser = new AttentionUserModel()
-    } else {
-      return {
-        code: ERROR,
-        msg: '当前用户已关注',
-        data: attentionUser._id
+    if (attentionUserRecord) {
+      const response = await attentionUserRecord.update({
+        $addToSet: {
+          attentionUserList: targetUser!._id
+        }
+      })
+      if (response.ok) {
+        if (response.nModified > 0) {
+          await Promise.all([
+            targetUser!.update({
+              $inc: {
+                fansCount: 1
+              }
+            }),
+            user.update({
+              $inc: {
+                attentionCount: 1
+              }
+            })
+          ])
+        }
+        return {
+          code: SUCCESS,
+          msg: '关注成功'
+        }
       }
+    } else {
+      const record = new AttentionUserModel()
+
+      record.user = user
+      record.attentionUserList = [targetUser!]
+
+      await Promise.all([
+        targetUser!.update({
+          $inc: {
+            fansCount: 1
+          }
+        }),
+        user.update({
+          $inc: {
+            attentionCount: 1
+          }
+        })
+      ])
+      await record.save()
     }
-
-    attentionUser.user = user
-
-    attentionUser.attentionUser = targetUser!
-
-    await Promise.all([targetUser!.save(), attentionUser.save()])
-
     return {
       code: SUCCESS,
-      msg: '关注成功',
-      data: attentionUser._id
+      msg: '关注成功'
     }
   }
   /**
@@ -68,25 +113,42 @@ export default class AttentionUserService extends BaseService {
       this.error('目标用户不存在')
     }
     const attentionUser = await AttentionUserModel.findOne({
-      user: user._id,
-      attentionUser: targetUser!._id
+      user: user._id
     }).exec()
     if (attentionUser) {
-      await attentionUser.remove()
-
-      return {
-        code: SUCCESS,
-        msg: '取消关注成功'
+      const response = await attentionUser.update({
+        $pull: {
+          attentionUserList: targetUser!._id
+        }
+      })
+      if (response.ok) {
+        if (response.nModified > 0) {
+          await Promise.all([
+            targetUser!.updateOne({
+              $inc: {
+                fansCount: -1
+              }
+            }),
+            user.update({
+              $inc: {
+                attentionCount: -1
+              }
+            })
+          ])
+        }
+        return {
+          code: SUCCESS,
+          msg: '取消关注成功'
+        }
       }
-    } else {
-      return {
-        code: ERROR,
-        msg: '操作失败'
-      }
+    }
+    return {
+      code: ERROR,
+      msg: '操作失败'
     }
   }
   /**
-   * @description 获取当前用户的关注用户列表
+   * @description 获取用户的关注用户列表
    * @author lentoo
    * @date 2019-09-23
    * @param {PaginationProp} pagination
@@ -94,47 +156,90 @@ export default class AttentionUserService extends BaseService {
    * @memberof AttentionUserService
    */
   public async attentionUserList(
-    pagination: PaginationProp
-  ): Promise<PaginationAttentionUserResponse> {
-    const user = await this.getAuthUser()
-
+    pagination: PaginationProp,
+    user: InstanceType<UserInfo>
+  ): Promise<PaginationUserResponse> {
     const userItemsFields = this.ctx.request.body.selectFields.items
-      .attentionUser
-
+    const loginUser = await this.getAuthUser()
     const fields = this.toProjection(userItemsFields)
-
-    const { page, items } = await AttentionUserModel.paginationQuery(
-      {
+    const [count, item] = await Promise.all([
+      AttentionUserModel.findOne({
         user: user._id
-      },
-      pagination.page,
-      pagination.limit,
-      [
-        {
-          path: 'attentionUser',
+      }).exec(),
+      AttentionUserModel.findOne({
+        user: user._id
+      })
+        .populate({
+          path: 'attentionUserList',
           model: 'UserInfo',
-          select: fields
-        }
-      ]
-    )
-    const response = new PaginationAttentionUserResponse()
+          select: fields,
+          options: {
+            limit: pagination.limit,
+            skip: (pagination.page - 1) * pagination.limit
+          }
+        })
+        .exec()
+    ])
+    const total = count ? count.attentionUserList.length : 0
+    const pages = Math.ceil(total / pagination.limit)
+    const response = new PaginationUserResponse()
+    const items = item ? (item.attentionUserList as UserInfo[]) : []
+    if (String(loginUser._id) === String(user._id)) {
+      items.forEach(u => {
+        u.isAttention = true
+      })
+    } else {
+      const loginUserFollowList = await AttentionUserModel.findOne({
+        user: loginUser._id
+      })
+      if (loginUserFollowList) {
+        items.forEach(u => {
+          u.isAttention = loginUserFollowList.attentionUserList.some(
+            id => String(u._id) === String(id)
+          )
+        })
+      }
+    }
 
-    response.setData(page, items)
+    response.setData(
+      {
+        ...pagination,
+        total,
+        pages,
+        hasMore: pages !== 0 && pagination.page !== pages
+      },
+      items
+    )
 
     return response
   }
+  public async getCurrentUserAttentionUserList(pagination: PaginationProp) {
+    const user = await this.getAuthUser()
+    return this.attentionUserList(pagination, user)
+  }
+  public async getAttentionUserList(uid: string, pagination: PaginationProp) {
+    const user = await UserInfoModel.findById(uid)
+    if (user) {
+      return this.attentionUserList(pagination, user)
+    } else {
+      this.error('用户不存在')
+    }
+  }
 
   public async attentionSelfUserList(
-    page: PaginationProp = { page: 1, limit: 10 }
+    page: PaginationProp = { page: 1, limit: 10 },
+    user: InstanceType<UserInfo>
   ) {
-    const user = await this.getAuthUser()
+    // const user = await this.getAuthUser()
     // 关注我的
     const {
       page: pagination,
       items
     } = await AttentionUserModel.paginationQuery(
       {
-        attentionUser: user._id
+        attentionUserList: {
+          $in: user._id
+        }
       },
       page.page,
       page.limit,
@@ -146,26 +251,39 @@ export default class AttentionUserService extends BaseService {
       ]
     )
     // 我关注的
-    const attentions = await AttentionUserModel.find({
-      user: user._id,
-      attentionUser: {
+    const loginUser = await this.getAuthUser()
+    const attentions = await AttentionUserModel.findOne({
+      user: loginUser._id,
+      attentionUserList: {
         $in: items.map(item => {
           const user = item.user as UserInfo
           return user._id
         })
       }
     }).exec()
-    console.log('attentions', attentions)
-    console.log('items', items)
-    items.forEach(item => {
-      const user = item.user as UserInfo
-      user.isAttention = attentions.some(
-        a => String(a.attentionUser) === String(user._id)
-      )
-      return item
-    })
+    if (attentions) {
+      items.forEach(item => {
+        const user = item.user as UserInfo
+        user.isAttention = attentions.attentionUserList.some(
+          a => String(a) === String(user._id)
+        )
+        return item
+      })
+    }
     const response = new PaginationAttentionUserResponse()
     response.setData(pagination, items)
     return response
+  }
+
+  public async getFansList(
+    uid: string,
+    page: PaginationProp = { page: 1, limit: 10 }
+  ) {
+    const user = await UserInfoModel.findById(uid)
+    if (user) {
+      return this.attentionSelfUserList(page, user)
+    } else {
+      this.error('用户不存在')
+    }
   }
 }

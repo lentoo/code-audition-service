@@ -41,18 +41,20 @@ export default class UserInfoService extends BaseService {
       pagination.page,
       pagination.limit
     )
-    const attentionUserList = await AttentionUserModel.find({
+    // 当前用户已关注的用户
+    const attentionUserList = await AttentionUserModel.findOne({
       user: user._id,
-      attentionUser: {
-        $in: items.map(item => item._id)
+      attentionUserList: {
+        $in: items.map(item => String(item._id))
       }
     }).exec()
-    items.forEach(item => {
-      item.isAttention =
-        attentionUserList.findIndex(
-          u => String(u.attentionUser) === String(item._id)
-        ) > -1
-    })
+    if (attentionUserList) {
+      items.forEach(item => {
+        item.isAttention = attentionUserList.attentionUserList.some(
+          u => String(u) === String(item._id)
+        )
+      })
+    }
     const response = new PaginationUserResponse()
     response.setData(page, items)
     return response
@@ -79,39 +81,15 @@ export default class UserInfoService extends BaseService {
       const attention = await AttentionUserModel.findOne(
         {
           user: selfUser._id,
-          attentionUser: user._id
+          attentionUserList: {
+            $in: user._id
+          }
         },
         {
           _id: 1
         }
       ).exec()
       user.isAttention = !!attention
-      // 当前用户的粉丝数
-      const aggregate = await AttentionUserModel.aggregate([
-        {
-          $match: {
-            attentionUser: user._id
-          }
-        },
-        {
-          $group: {
-            _id: '$_id',
-            count: {
-              $sum: 1
-            }
-          }
-        }
-      ]).exec()
-      if (aggregate.length > 0) {
-        user.fansCount = aggregate[0].count
-      } else {
-        user.fansCount = 0
-      }
-      console.log('aggregate', aggregate)
-      // 当前用户关注的用户数
-      user.attentionCount = await AttentionUserModel.find({
-        user: user._id
-      }).count()
     }
     return user
   }
@@ -161,18 +139,26 @@ export default class UserInfoService extends BaseService {
   }
 
   public async userLikeSort(sortId: string): Promise<ActionResponseModel> {
-    const u = await this.ctx.currentUserInfo()
-    const user = await UserInfoModel.isExist(u!.openId!)
+    // const u = await this.ctx.currentUserInfo()
+    const user = await this.getAuthUser()
     const sort = await SortModel.findById(sortId)
     if (sort) {
-      if (user.isLikeSortBySortId(String(sort._id))) {
-        this.error('该分类已关注')
-      } else {
-        user.likeSorts!.push(sort)
-        sort.attentionNum! += 1
+      const res = await user.updateOne({
+        $addToSet: {
+          likeSorts: sort
+        }
+      })
+      if (res.ok) {
+        if (res.nModified === 0) {
+          this.error('该分类已关注')
+        } else {
+          await sort.updateOne({
+            $inc: {
+              attentionNum: 1
+            }
+          })
+        }
       }
-      sort.save()
-      await user.save()
     } else {
       this.error('分类不存在')
     }
@@ -184,23 +170,32 @@ export default class UserInfoService extends BaseService {
   }
 
   public async userUnLikeSort(sortId: string): Promise<ActionResponseModel> {
-    const u = await this.ctx.currentUserInfo()
-    const user = await UserInfoModel.isExist(u!.openId!)
+    // const u = await this.ctx.currentUserInfo()
+    const user = await this.getAuthUser()
     const sort = await SortModel.findById(sortId)
     if (sort) {
-      if (user.isLikeSortBySortId(String(sort._id))) {
-        sort.attentionNum! -= 1
-        if (user.likeSorts) {
-          user.likeSorts.splice(
-            user.likeSorts.findIndex(sid => String(sid) === String(sort._id)),
-            1
-          )
+      const userIsLikeSort = await UserInfoModel.findOne({
+        _id: user._id,
+        likeSorts: {
+          $in: sort._id
         }
+      })
+      if (userIsLikeSort) {
+        await Promise.all([
+          user.updateOne({
+            $pull: {
+              likeSorts: sort._id
+            }
+          }),
+          sort.updateOne({
+            $inc: {
+              attentionNum: -1
+            }
+          })
+        ])
       } else {
         this.error(`用户未关注该分类: ${sort.sortName}`)
       }
-      sort.save()
-      await user.save()
     } else {
       this.error('分类不存在')
     }
@@ -218,11 +213,14 @@ export default class UserInfoService extends BaseService {
     }
     const userinfo = await UserInfoModel.findById(user!._id, fields)
     if (userinfo) {
-      userinfo.attentionCount = await AttentionUserModel.find({
+      const res = await AttentionUserModel.findOne({
         user: userinfo._id
-      }).count()
+      }).exec()
+      userinfo.attentionCount = res ? res.attentionUserList.length : 0
       userinfo.fansCount = await AttentionUserModel.find({
-        attentionUser: userinfo._id
+        attentionUserList: {
+          $in: userinfo._id
+        }
       }).count()
     }
     return userinfo

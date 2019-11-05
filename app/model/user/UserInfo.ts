@@ -97,10 +97,12 @@ export class UserInfo extends BaseModel {
   @Field(type => [Question], { nullable: true })
   brushedQuestions: Ref<Question>[]
 
-  @Field({ nullable: true, description: '关注用户总数', defaultValue: 0 })
+  @Field({ description: '关注用户总数', defaultValue: 0 })
+  @prop({ default: 0 })
   attentionCount: number
 
   @Field({ nullable: true, description: '粉丝数', defaultValue: 0 })
+  @prop({ default: 0 })
   fansCount: number
 
   @Field({ nullable: true, description: '是否关注了用户' })

@@ -1,5 +1,5 @@
 import { Context } from 'egg'
-import { UserInfo } from '../model/user/UserInfo'
+import { UserInfo, UserInfoModel } from '../model/user/UserInfo'
 import * as jwt from 'jsonwebtoken'
 export default {
   get openId(this: Context) {
