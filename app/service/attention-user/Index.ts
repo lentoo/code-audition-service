@@ -213,10 +213,7 @@ export default class AttentionUserService extends BaseService {
 
     return response
   }
-  public async getCurrentUserAttentionUserList(pagination: PaginationProp) {
-    const user = await this.getAuthUser()
-    return this.attentionUserList(pagination, user)
-  }
+
   public async getAttentionUserList(uid: string, pagination: PaginationProp) {
     const user = await UserInfoModel.findById(uid)
     if (user) {
