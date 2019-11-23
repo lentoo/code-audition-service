@@ -24,6 +24,7 @@ import { SortModel } from '../../model/sort/Sort'
 import { InstanceType } from 'typegoose'
 import { Idea, IdeaModel } from '../../model/question/Idea'
 import { CollectionModel } from '../../model/collection/Collection'
+import { ActionType } from '../../model/notification/Notification'
 
 export default class QuestionService extends BaseService {
   public async addQuestion(
@@ -321,12 +322,13 @@ export default class QuestionService extends BaseService {
     }
 
     if (user) {
-      const question = await QuestionModel.findById(questionId)
+      const question = await QuestionModel.findById(questionId).exec()
       if (question) {
         const idea = new IdeaModel()
         idea.question = question
         idea.content = content
         idea.userinfo = user
+        let tid = String(question.userinfo)
         if (targetIdeaId) {
           const ideaModel = await IdeaModel.findById(targetIdeaId).exec()
           if (!ideaModel) {
@@ -334,9 +336,28 @@ export default class QuestionService extends BaseService {
           } else {
             idea.targetIdea = ideaModel
             idea.targetUser = ideaModel.userinfo
+            tid = String(idea.targetUser)
           }
         }
         const res = await idea.save()
+        const notifyProp = {
+          sid: user!._id,
+          tid,
+          actionType: targetIdeaId ? ActionType.ReplyIdea : ActionType.Idea,
+          content,
+          targetId: targetIdeaId ? targetIdeaId : questionId
+        }
+        const notify = await this.service.notification.index.findNotify(
+          notifyProp
+        )
+        const inserNotify = notify === null
+
+        if (inserNotify) {
+          // 插入一条消息
+          this.service.notification.index.createNotify({
+            ...notifyProp
+          })
+        }
 
         return {
           code: SUCCESS,

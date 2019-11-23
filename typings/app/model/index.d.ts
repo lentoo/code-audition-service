@@ -8,6 +8,7 @@ import ExportAttentionUserAttentionUser from '../../../app/model/attention-user/
 import ExportCollectionCollection from '../../../app/model/collection/Collection';
 import ExportFeedbackFeedBack from '../../../app/model/feedback/FeedBack';
 import ExportMessageMessage from '../../../app/model/message/Message';
+import ExportNotificationNotification from '../../../app/model/notification/Notification';
 import ExportQuestionIdea from '../../../app/model/question/Idea';
 import ExportQuestionQuestion from '../../../app/model/question/Question';
 import ExportSortSort from '../../../app/model/sort/Sort';
@@ -28,6 +29,9 @@ declare module 'egg' {
     }
     Message: {
       Message: ReturnType<typeof ExportMessageMessage>;
+    }
+    Notification: {
+      Notification: ReturnType<typeof ExportNotificationNotification>;
     }
     Question: {
       Idea: ReturnType<typeof ExportQuestionIdea>;

@@ -10,6 +10,7 @@ import ExportUserInfo from '../../../app/service/UserInfo';
 import ExportAttentionUserIndex from '../../../app/service/attention-user/Index';
 import ExportCollectionIndex from '../../../app/service/collection/Index';
 import ExportFeedbackIndex from '../../../app/service/feedback/Index';
+import ExportNotificationIndex from '../../../app/service/notification/index';
 import ExportQuestionIdea from '../../../app/service/question/Idea';
 import ExportQuestionIndex from '../../../app/service/question/index';
 
@@ -28,6 +29,9 @@ declare module 'egg' {
     }
     feedback: {
       index: ExportFeedbackIndex;
+    }
+    notification: {
+      index: ExportNotificationIndex;
     }
     question: {
       idea: ExportQuestionIdea;
