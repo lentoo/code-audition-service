@@ -12,6 +12,7 @@ import {
 import { SUCCESS, ERROR } from '../../constants/Code'
 import { PaginationProp } from '../../model/Pagination'
 import { InstanceType } from 'typegoose'
+import { ActionType } from '../../model/notification/Notification'
 
 export default class AttentionUserService extends BaseService {
   public async attentionUserByUid(
@@ -54,6 +55,14 @@ export default class AttentionUserService extends BaseService {
         }
       })
       if (response.ok) {
+        const res = await this.service.notification.index.findNotify({
+          sid: user.id,
+          tid: id,
+          actionType: ActionType.FollowUserInfo,
+          targetId: id,
+          content: '用户关注'
+        })
+        const isInserNotify = res === null
         if (response.nModified > 0) {
           await Promise.all([
             targetUser!.update({
@@ -65,7 +74,16 @@ export default class AttentionUserService extends BaseService {
               $inc: {
                 attentionCount: 1
               }
-            })
+            }),
+            // 插入一条消息
+            isInserNotify &&
+              this.service.notification.index.createNotify({
+                sid: user!.id,
+                tid: id,
+                actionType: ActionType.FollowUserInfo,
+                content: '用户关注',
+                targetId: id
+              })
           ])
         }
         return {
@@ -136,6 +154,13 @@ export default class AttentionUserService extends BaseService {
             })
           ])
         }
+        this.service.notification.index.deleteUnReadNotify({
+          sid: user!.id,
+          tid: id,
+          actionType: ActionType.FollowUserInfo,
+          targetId: id,
+          content: '用户关注'
+        })
         return {
           code: SUCCESS,
           msg: '取消关注成功'
