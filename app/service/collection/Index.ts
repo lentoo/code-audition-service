@@ -188,18 +188,20 @@ export default class CollectionService extends BaseService {
         QuestionModel.findById(questionId).exec()
       ])
       // 2. 清除相关信息
-      clearCollecitons.forEach(clear => {
-        clear.questionNum = clear.questionNum ? clear.questionNum - 1 : 0
-        if (question) {
-          question.collectionNum -= 1
-        }
-        clear.questions.splice(
-          clear.questions.findIndex(item => String(item) === questionId),
-          1
-        )
-        // 3. 更新数据
-        clear.save()
-      })
+      if (clearCollecitons) {
+        clearCollecitons.forEach(clear => {
+          clear.questionNum = clear.questionNum ? clear.questionNum - 1 : 0
+          if (question) {
+            question.collectionNum -= 1
+          }
+          clear.questions.splice(
+            clear.questions.findIndex(item => String(item) === questionId),
+            1
+          )
+          // 3. 更新数据
+          clear.save()
+        })
+      }
       Promise.all([question!.save(), user.save()])
       return {
         code: SUCCESS,
@@ -225,7 +227,7 @@ export default class CollectionService extends BaseService {
       if (!question) {
         this.error('题目不存在')
       }
-      if (collections.length === 0) {
+      if (collections && collections.length === 0) {
         this.error('收藏集不存在')
       }
 
@@ -251,7 +253,7 @@ export default class CollectionService extends BaseService {
           prevC.save()
         }
       })
-      if (question) {
+      if (question && collections) {
         collections.forEach(async collection => {
           if (!prevCIds.includes(String(collection._id))) {
             collection!.questions.push(question)
