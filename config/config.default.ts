@@ -1,5 +1,5 @@
 import { EggAppConfig, EggAppInfo, PowerPartial } from 'egg'
-
+import * as db from './db.json'
 export default (appInfo: EggAppInfo) => {
   const config = {} as PowerPartial<EggAppConfig>
 
@@ -39,7 +39,8 @@ export default (appInfo: EggAppInfo) => {
       port: 6379,
       host: '127.0.0.1',
       db: 0,
-      password: ''
+
+      password: db.redis
     }
   }
   config.io = {
@@ -53,7 +54,8 @@ export default (appInfo: EggAppInfo) => {
     redis: {
       host: '127.0.0.1',
       port: 6379,
-      db: 1
+      db: 1,
+      password: db.redis
     }
   }
 

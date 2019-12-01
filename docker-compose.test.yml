@@ -32,8 +32,10 @@ services:
       - "6379:6379"
     volumes:
       - "/www/data/redis:/data"
+      - "/www/data/redis-conf/redis.conf:/etc/redis/redis.conf"
     networks:
       - code-audition-network
+    command: redis-server /etc/redis/redis.conf
 
   egg-code-audition:
     build: .

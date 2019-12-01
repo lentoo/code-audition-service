@@ -18,6 +18,7 @@ export default class CollectionService extends BaseService {
     const user = await UserInfoModel.findById(u!._id).exec()
     if (user) {
       const c = await CollectionModel.findOne({
+        userinfo: user._id,
         name
       }).exec()
       if (c) {
