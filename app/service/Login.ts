@@ -203,10 +203,13 @@ export default class LoginService extends BaseService {
    */
   public async loginOut(): Promise<ActionResponseModel> {
     const authorization = this.ctx.authorizationToken
-    const user = await this.ctx.currentUserInfo()
+    const user = await this.getAuthUser()
     this.app.redis.del(user!._id!)
 
-    await this.app.redis.del(authorization)
+    await Promise.all([
+      this.app.redis.del(authorization),
+      this.app.redis.del(`st-${user._id}`)
+    ])
 
     return {
       code: SUCCESS,
@@ -239,7 +242,7 @@ export default class LoginService extends BaseService {
       },
       SERCRET,
       {
-        expiresIn: '2 days'
+        expiresIn: '1h'
       }
     )
     const serverAuthorizationToken = jwt.sign(
@@ -249,7 +252,7 @@ export default class LoginService extends BaseService {
         role: u.role
       },
       SERCRET,
-      { expiresIn: '7 days' }
+      { expiresIn: '1d' }
     )
     await Promise.all([
       this.app.redis.set(authorizationToken, JSON.stringify({ _id: u._id })),

@@ -13,6 +13,7 @@ services:
       - "/Users/lentoo/Downloads/cert/cert.pem:/Users/lentoo/Downloads/cert/cert.pem"
       - "/Users/lentoo/Downloads/cert/cert.key:/Users/lentoo/Downloads/cert/cert.key"
       - "/Users/lentoo/usr/etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
+      - "/Users/lentoo/usr/etc/nginx/servers:/etc/nginx/servers"
     links:
       - "egg-code-audition:egg-code-node-1"
     networks:
@@ -35,8 +36,10 @@ services:
       - "6379:6379"
     volumes:
       - "/Users/lentoo/usr/etc/redis:/data"
+      - "/Users/lentoo/usr/etc/redis-conf/redis.conf:/etc/redis/redis.conf"
     networks:
       - code-audition-network
+    command: redis-server /etc/redis/redis.conf
 
   egg-code-audition:
     build: .
