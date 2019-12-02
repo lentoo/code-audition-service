@@ -17,6 +17,12 @@ export class Collection extends BaseModel {
   @Field()
   @prop()
   name: string
+  /**
+   * 是否是私密的
+   */
+  @Field({ description: '是否是私密的' })
+  @prop({ default: false })
+  isPrimary: boolean
 
   @prop({ ref: UserInfo })
   @Field(type => UserInfo)

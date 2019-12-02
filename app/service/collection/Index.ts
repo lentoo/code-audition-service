@@ -12,10 +12,11 @@ import { QuestionModel, Question } from '../../model/question/Question'
 import { InstanceType } from 'typegoose'
 
 export default class CollectionService extends BaseService {
-  public async addCollection(name: string): Promise<ActionResponseModel> {
-    const u = await this.getCurrentUser()
-
-    const user = await UserInfoModel.findById(u!._id).exec()
+  public async addCollection(
+    name: string,
+    isPrimary: boolean = false
+  ): Promise<ActionResponseModel> {
+    const user = await this.getAuthUser()
     if (user) {
       const c = await CollectionModel.findOne({
         userinfo: user._id,
@@ -27,6 +28,7 @@ export default class CollectionService extends BaseService {
         const collection = new CollectionModel()
         collection.name = name
         collection.userinfo = user
+        collection.isPrimary = isPrimary
         const c = await collection.save()
         return {
           code: SUCCESS,
@@ -140,7 +142,8 @@ export default class CollectionService extends BaseService {
   }
   public async updateCollection(
     id: string,
-    name: string
+    name: string,
+    isPrimary: boolean
   ): Promise<ActionResponseModel> {
     const user = await this.getAuthUser()
     const collection = await CollectionModel.findOne({
@@ -156,8 +159,12 @@ export default class CollectionService extends BaseService {
       .exec()
 
     if (collection) {
-      collection.name = name
-      await collection.save()
+      await collection.updateOne({
+        $set: {
+          name,
+          isPrimary
+        }
+      })
     } else {
       this.error('收藏集不存在')
     }

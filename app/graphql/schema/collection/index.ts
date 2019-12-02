@@ -37,8 +37,12 @@ export class CollectionResolver {
   @Mutation(of => ActionResponseModel, { description: '添加收藏集' })
   @Authorized()
   @UseMiddleware(RequestLogRecord)
-  public async addCollection(@Ctx() ctx: Context, @Arg('name') name: string) {
-    return await ctx.service.collection.index.addCollection(name)
+  public async addCollection(
+    @Ctx() ctx: Context,
+    @Arg('name') name: string,
+    @Arg('isPrimary') isPrimary: boolean
+  ) {
+    return await ctx.service.collection.index.addCollection(name, isPrimary)
   }
 
   @Mutation(of => ActionResponseModel, { description: '修改收藏集' })
@@ -47,9 +51,14 @@ export class CollectionResolver {
   public async updateCollection(
     @Ctx() ctx: Context,
     @Arg('id') id: string,
-    @Arg('name') name: string
+    @Arg('name') name: string,
+    @Arg('isPrimary') isPrimary: boolean
   ) {
-    return await ctx.service.collection.index.updateCollection(id, name)
+    return await ctx.service.collection.index.updateCollection(
+      id,
+      name,
+      isPrimary
+    )
   }
 
   @Mutation(of => ActionResponseModel, { description: '删除收藏集' })
