@@ -24,7 +24,8 @@ describe('test/app/service/colleciton/Index.ts', () => {
   it('update collection name', async () => {
     const response = await ctx.service.collection.index.updateCollection(
       newId,
-      'update colleciton'
+      'update colleciton',
+      true
     )
     assert(response.code === SUCCESS)
 
