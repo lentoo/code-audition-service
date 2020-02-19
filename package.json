@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "apollo-server-koa": "^2.9.3",
-    "codecov": "^3.5.0",
+    "codecov": "^3.6.5",
     "dataloader": "^1.4.0",
     "dayjs": "^1.8.16",
     "egg": "^2.6.1",
