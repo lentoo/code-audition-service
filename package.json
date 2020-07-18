@@ -47,7 +47,7 @@
     "egg-validate": "^2.0.2",
     "graphql-fields": "^2.0.3",
     "jsonwebtoken": "^8.5.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "mongoose": "^5.7.5",
     "nanoid": "^2.1.0",
     "reflect-metadata": "^0.1.13",
