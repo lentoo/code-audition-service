@@ -51,7 +51,7 @@
     "mongoose": "^5.7.5",
     "nanoid": "^2.1.0",
     "reflect-metadata": "^0.1.13",
-    "socket.io": "^2.2.0",
+    "socket.io": "^2.4.0",
     "type-graphql": "^0.17.5",
     "typegoose": "^5.9.1",
     "typescript": "^3.0.0"
